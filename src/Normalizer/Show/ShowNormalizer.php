@@ -106,7 +106,7 @@ class ShowNormalizer implements NormalizerInterface
                 "character" => []
             ];
 
-            if($human->getEntity() !== null){
+            if($concept_art->getEntity() !== null){
                 $h["character"] = [
                     "id" => $concept_art->getEntity()->getId(),
                     "name" => $concept_art->getEntity()->getEntityName()
