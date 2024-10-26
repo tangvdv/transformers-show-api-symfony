@@ -7,17 +7,29 @@ use Symfony\Component\Serializer\Serializer;
 
 class ResponseHandler extends Controller
 {
-    public function createResponse(int $statusCode, mixed $data, array $normalizers = []): Response
+    public function createResponse(int $statusCode, mixed $data = [], array $normalizers = []): Response
     {
         if(count($normalizers) > 0){
             $serializer = new Serializer($normalizers);
             $data = $serializer->normalize($data, "json");
         }
 
-        $json = json_encode([
-            "StatusCode" => $statusCode,
-            "Data" => [$this->serializer->serialize($data, "json")]
-        ]);
+        $arr = [
+            "code" => $statusCode,
+            "total" => $data["total"] ?? null,
+            "limit" => $data["limit"] ?? null,
+            "items" => $data["items"] ?? []
+        ];
+
+        if(!array_key_exists("total", $data) || !$data["total"]){
+            unset($arr["total"]);
+        }
+
+        if(!array_key_exists("limit", $data) || !$data["limit"]){
+            unset($arr["limit"]);
+        }
+
+        $json = $this->serializer->serialize($arr, 'json');
 
         return new Response($json, $statusCode, ['Content-Type', 'application/json']);
     }
@@ -25,8 +37,8 @@ class ResponseHandler extends Controller
     public function createErrorResponse(int $statusCode, string $message = ''): Response
     {
         $json = json_encode([
-            "StatusCode" => $statusCode,
-            "Message" => $message
+            "code" => $statusCode,
+            "message" => $message
         ]);
 
         return new Response($json, $statusCode, ['Content-Type', 'application/json']);
