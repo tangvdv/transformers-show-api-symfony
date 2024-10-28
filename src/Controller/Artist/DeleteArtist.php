@@ -24,15 +24,10 @@ class DeleteArtist extends ArtistController
             $entityManager->remove($artist);
             $entityManager->flush();
 
-            return new Response("This artist is deleted", 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NO_CONTENT);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Artist not found");
         }
     }
 }

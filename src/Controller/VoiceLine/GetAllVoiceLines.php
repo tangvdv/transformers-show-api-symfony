@@ -4,7 +4,6 @@ namespace App\Controller\VoiceLine;
 
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use App\Normalizer\VoiceLine\VoiceLineNormalizer;
 
@@ -26,7 +25,7 @@ class GetAllVoiceLines extends VoiceLineController
                 $limit = $request->query->getInt('limit');
             }
             else{
-                return new Response("Parameter `limit` is in incorrect type format, `integer` is needed", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST,"Parameter `limit` is in incorrect type format, `integer` is needed");
             }
         }
 
@@ -41,22 +40,15 @@ class GetAllVoiceLines extends VoiceLineController
         $voicelines = $this->voiceLineRepository->findAllWithParams($limit, $show, $entity);
 
         if($voicelines){
-            $serializer = new Serializer([new VoiceLineNormalizer]);
-            $data = $serializer->normalize([
-                "voice_line_total" => count($voicelines),
+            $data = [
+                "total" => count($voicelines),
                 "limit" => $limit,
-                "voice_lines" => $voicelines
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+                "items" => $voicelines
+            ];
+            return $this->responseHandler->createResponse(Response::HTTP_OK, $data, [new VoiceLineNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createResponse(Response::HTTP_OK);
         }
     }
 }

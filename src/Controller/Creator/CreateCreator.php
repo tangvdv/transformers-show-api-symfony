@@ -47,7 +47,7 @@ class CreateCreator extends CreatorController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     if(array_key_exists("default", $value)){
@@ -57,13 +57,13 @@ class CreateCreator extends CreatorController
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
             }
         }
 
         if(!in_array($params["category"]["value"], $categories)){
-            return new Response("Parameter `category` has incorrect value. `producer`, `director`, `writer` or `composer` is authorized", 400, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `category` has incorrect value. `producer`, `director`, `writer` or `composer` is authorized");
         }
 
         if($this->creatorRepository->findOneBy(
@@ -71,7 +71,7 @@ class CreateCreator extends CreatorController
                 "creator_firstname" => $params["first_name"]["value"], 
                 "creator_lastname" => $params["last_name"]["value"]
         ))){
-            return new Response("This creator already exist");
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "A creator with this name already exist");
         }
 
         $creator = new Creator();
@@ -82,11 +82,6 @@ class CreateCreator extends CreatorController
         $entityManager->persist($creator);
         $entityManager->flush();
 
-        $serializer = new Serializer([new CreateUpdateCreatorNormalizer]);
-        $data = $serializer->normalize([
-            "creator" => $creator
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $creator], [new CreateUpdateCreatorNormalizer]);
     }
 }

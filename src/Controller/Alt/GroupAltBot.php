@@ -4,7 +4,6 @@ namespace App\Controller\Alt;
 
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\Alt\AltNormalizer;
 use App\Repository\BotRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,29 +22,24 @@ class GroupAltBot extends AltController
     {
         $alt = $this->altRepository->find($altId);
         if(!$alt){
-            return new Response("This alt doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Alt not found");
         }
 
         $bot = $botRepository->find($botId);
         if(!$bot){
-            return new Response("This bot doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Bot not found");
         }
 
         $bots = $alt->getBots();
         if($bots->contains($bot)){
-            return new Response("This alt is already linked to this bot", 400, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "This Alt is already linked to this Bot");
         }
         else{
             $alt->addBot($bot);
             $entityManager->persist($alt);
             $entityManager->flush();
 
-            $serializer = new Serializer([new AltNormalizer]);
-            $data = $serializer->normalize([
-                "alt" => $alt
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $alt], [new AltNormalizer]);
         }
     }
 
@@ -60,24 +54,24 @@ class GroupAltBot extends AltController
     {
         $alt = $this->altRepository->find($altId);
         if(!$alt){
-            return new Response("This alt doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Alt not found");
         }
 
         $bot = $botRepository->find($botId);
         if(!$bot){
-            return new Response("This bot doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "TBot not found");
         }
 
         $bots = $alt->getBots();
         if(!$bots->contains($bot)){
-            return new Response("No link found between this alt and this bot", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "No link was found between this Alt and This Bot");
         }
         else{
             $alt->removeBot($bot);
             $entityManager->persist($alt);
             $entityManager->flush();
             
-            return new Response("This bot has been removed from this alt successfully");
+            return $this->responseHandler->createResponse(Response::HTTP_NO_CONTENT);
         }
     }
 }

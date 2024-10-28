@@ -23,29 +23,24 @@ class GroupCreatorShow extends CreatorController
     {
         $creator = $this->creatorRepository->find($creatorId);
         if(!$creator){
-            return new Response("This creator doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Creator not found");
         }
 
         $show = $showRepository->find($showId);
         if(!$show){
-            return new Response("This show doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Show not found");
         }
 
         $shows = $creator->getShows();
         if($shows->contains($show)){
-            return new Response("This creator is already linked to this show", 400, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "This Creator is already linked to this Show");
         }
         else{
             $creator->addShow($show);
             $entityManager->persist($creator);
             $entityManager->flush();
 
-            $serializer = new Serializer([new CreatorNormalizer]);
-            $data = $serializer->normalize([
-                "creator" => $creator
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $creator], [new CreatorNormalizer]);
         }
     }
 
@@ -60,24 +55,24 @@ class GroupCreatorShow extends CreatorController
     {
         $creator = $this->creatorRepository->find($creatorId);
         if(!$creator){
-            return new Response("This creator doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Creator not found");
         }
 
         $show = $showRepository->find($showId);
         if(!$show){
-            return new Response("This show doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Show not found");
         }
 
         $shows = $creator->getShows();
         if(!$shows->contains($show)){
-            return new Response("No link found between this creator and this show", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "No link found between this Creator and this Show");
         }
         else{
             $creator->removeShow($show);
             $entityManager->persist($creator);
             $entityManager->flush();
             
-            return new Response("This creator has been removed from this show successfully");
+            return $this->responseHandler->createResponse(Response::HTTP_NO_CONTENT);
         }
     }
 }

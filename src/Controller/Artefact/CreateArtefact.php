@@ -10,7 +10,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\EntityRepository;
 use App\Repository\ShowRepository;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\Artefact\ArtefactNormalizer;
 use App\Repository\ScreenTimeRepository;
 
@@ -52,7 +51,7 @@ class CreateArtefact extends ArtefactController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     if(array_key_exists("default", $value)){
@@ -62,26 +61,26 @@ class CreateArtefact extends ArtefactController
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
             }
         }
         
         $entity = $entityRepository->find($params["entityId"]["value"]);
         if($entity === null){
-            return new Response("This entity doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Entity not found");
         }
         
         $show = $showRepository->find($params["showId"]["value"]);
         if($show === null){
-            return new Response("This show doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Show not found");
         }
 
         $screen_time = null;
         if($params["screen_timeId"]["value"] !== null){
             $screen_time = $screenTimeRepository->find($params["screen_timeId"]["value"]);
             if($screen_time === null){
-                return new Response("This screen time doesn't exist", 404, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Screen Time not found");
             }
         }
 
@@ -90,7 +89,7 @@ class CreateArtefact extends ArtefactController
                 "entity" => $entity, 
                 "show" => $show
         ))){
-            return new Response("This artefact already exist");
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "An Artefact already exist with those parameters");
         }
 
         $artefact = new Artefact();
@@ -104,11 +103,6 @@ class CreateArtefact extends ArtefactController
         $entityManager->persist($artefact);
         $entityManager->flush();
 
-        $serializer = new Serializer([new ArtefactNormalizer]);
-        $data = $serializer->normalize([
-            "artefact" => $artefact
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $artefact], [new ArtefactNormalizer]);
     }
 }

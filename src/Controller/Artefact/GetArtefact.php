@@ -4,7 +4,6 @@ namespace App\Controller\Artefact;
 
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\Artefact\ArtefactNormalizer;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -42,20 +41,10 @@ class GetArtefact extends ArtefactController
     private function response(mixed $artefact): Response
     {
         if($artefact){
-            $serializer = new Serializer([new ArtefactNormalizer]);
-            $data = $serializer->normalize([
-                "artefact" => $artefact
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $artefact], [new ArtefactNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Artefact not found");
         }
     }
 }

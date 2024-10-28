@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Serializer;
 use App\Repository\NationalityRepository;
 
 class UpdateActor extends ActorController
@@ -63,7 +62,7 @@ class UpdateActor extends ActorController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     if(array_key_exists("default", $value)){
@@ -73,7 +72,7 @@ class UpdateActor extends ActorController
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
                 else{
                     if(array_key_exists("method", $value)){
@@ -86,7 +85,7 @@ class UpdateActor extends ActorController
         
         if($params["first_name"]["value"] !== $params["first_name"]["default"] || $params["last_name"]["value"] !== $params["last_name"]["default"]){
             if($this->actorRepository->findOneBy(array("actor_firstname" => $params["first_name"]["value"], "actor_lastname" => $params["last_name"]["value"]))){
-                return new Response("An actor with this name already exist", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "An actor with this name already exist");
             }
             $actor->setActorFirstname($params["first_name"]["value"])
                 ->setActorLastname($params["last_name"]["value"]);
@@ -95,7 +94,7 @@ class UpdateActor extends ActorController
         if($params["nationalityId"]["value"] !== null){
             $nationality = $nationalityRepository->find($params["nationalityId"]["value"]);
             if($nationality === null){
-                return new Response("This nationality doesn't exist", 404, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Nationality not found");
             }
             $actor->setNationality($nationality);
         }
@@ -103,11 +102,6 @@ class UpdateActor extends ActorController
         $entityManager->persist($actor);
         $entityManager->flush();
 
-        $serializer = new Serializer([new CreateUpdateActorNormalizer]);
-        $data = $serializer->normalize([
-            "actor" => $actor
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $actor], [new CreateUpdateActorNormalizer]);
     }
 }

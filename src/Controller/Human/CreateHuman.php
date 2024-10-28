@@ -10,7 +10,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\EntityRepository;
 use App\Repository\ShowRepository;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\Human\HumanNormalizer;
 use App\Repository\ActorRepository;
 use App\Repository\ScreenTimeRepository;
@@ -58,7 +57,7 @@ class CreateHuman extends HumanController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     if(array_key_exists("default", $value)){
@@ -68,31 +67,31 @@ class CreateHuman extends HumanController
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
             }
         }
         
         $entity = $entityRepository->find($params["entityId"]["value"]);
         if($entity === null){
-            return new Response("This entity doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Entity not found");
         }
         
         $show = $showRepository->find($params["showId"]["value"]);
         if($show === null){
-            return new Response("This show doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Show not found");
         }
 
         $actor = $actorRepository->find($params["actorId"]["value"]);
         if($actor === null){
-            return new Response("This actor doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Actor not found");
         }
 
         $screen_time = null;
         if($params["screen_timeId"]["value"] !== null){
             $screen_time = $screenTimeRepository->find($params["screen_timeId"]["value"]);
             if($screen_time === null){
-                return new Response("This screen time doesn't exist", 404, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Screen Time not found");
             }
         }
 
@@ -101,7 +100,7 @@ class CreateHuman extends HumanController
                 "entity" => $entity, 
                 "show" => $show
         ))){
-            return new Response("This human already exist");
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "This Human already exist in this Show");
         }
 
         $human = new Human();
@@ -116,11 +115,6 @@ class CreateHuman extends HumanController
         $entityManager->persist($human);
         $entityManager->flush();
 
-        $serializer = new Serializer([new HumanNormalizer]);
-        $data = $serializer->normalize([
-            "human" => $human
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $human], [new HumanNormalizer]);
     }
 }

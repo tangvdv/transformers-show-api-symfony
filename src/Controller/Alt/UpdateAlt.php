@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Serializer;
 
 class UpdateAlt extends AltController
 {
@@ -24,13 +23,9 @@ class UpdateAlt extends AltController
         $alt = $this->altRepository->findOneWithParams(array("id" => $id));
 
         if(!$alt){
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Alt not found");
         }
+
         $payload = $request->getPayload();
         $params = [
             "name" => [
@@ -61,7 +56,7 @@ class UpdateAlt extends AltController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     if(array_key_exists("default", $value)){
@@ -71,7 +66,7 @@ class UpdateAlt extends AltController
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
                 else{
                     if(array_key_exists("method", $value)){
@@ -84,7 +79,7 @@ class UpdateAlt extends AltController
 
         if($params["name"]["value"] !== null){
             if($this->altRepository->findOneBy(array("alt_name" => $params["name"]["value"]))){
-                return new Response("An alt already exist with this name", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "An Alt already exist with this name");
             }
             else{
                 $alt->setAltName($params["name"]["value"]);
@@ -94,11 +89,6 @@ class UpdateAlt extends AltController
         $entityManager->persist($alt);
         $entityManager->flush();
 
-        $serializer = new Serializer([new CreateUpdateAltNormalizer]);
-        $data = $serializer->normalize([
-            "alt" => $alt
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $alt], [new CreateUpdateAltNormalizer]);
     }
 }

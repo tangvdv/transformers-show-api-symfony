@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Serializer;
 use App\Repository\NationalityRepository;
 use App\Entity\VoiceActor;
 use App\Normalizer\VoiceActor\CreateUpdateVoiceActorNormalizer;
@@ -16,7 +15,7 @@ class CreateVoiceActor extends VoiceActorController
 {
     #[Route(
         '/api/voiceactor',
-        name: 'create_voiceactor',
+        name: 'create_voice_actor',
         methods: ['POST']
     )]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
@@ -50,7 +49,7 @@ class CreateVoiceActor extends VoiceActorController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     if(array_key_exists("default", $value)){
@@ -60,14 +59,14 @@ class CreateVoiceActor extends VoiceActorController
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
             }
         }
         
         $nationality = $nationalityRepository->find($params["nationalityId"]["value"]);
         if(!$nationality){
-            return new Response("This nationality doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Nationality not found");
         }
 
         if($this->voiceactorRepository->findOneBy(
@@ -75,23 +74,18 @@ class CreateVoiceActor extends VoiceActorController
                 "voiceactor_firstname" => $params["first_name"]["value"], 
                 "voiceactor_lastname" => $params["last_name"]["value"]
         ))){
-            return new Response("This voice actor already exist", 400, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "A Voice Actor with this name already exist");
         }
 
-        $voice_actor = new VoiceActor();
-        $voice_actor
+        $voiceactor = new VoiceActor();
+        $voiceactor
             ->setVoiceActorFirstname($params["first_name"]["value"])
             ->setVoiceActorLastname($params["last_name"]["value"])
             ->setNationality($nationality)
             ->setImage($params["image"]["value"]);
-        $entityManager->persist($voice_actor);
+        $entityManager->persist($voiceactor);
         $entityManager->flush();
 
-        $serializer = new Serializer([new CreateUpdateVoiceActorNormalizer]);
-        $data = $serializer->normalize([
-            "voiceactor" => $voice_actor
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $voiceactor], [new CreateUpdateVoiceActorNormalizer]);
     }
 }

@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Alt;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\Alt\CreateUpdateAltNormalizer;
 
 class CreateAlt extends AltController
@@ -51,7 +50,7 @@ class CreateAlt extends AltController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     if(array_key_exists("default", $value)){
@@ -61,13 +60,13 @@ class CreateAlt extends AltController
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
             }
         }
 
         if($this->altRepository->findOneBy(array("alt_name" => $params["name"]["value"]))){
-            return new Response("This alt already exist", 400, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "An Alt with this name already exist");
         }
 
         $alt = new Alt();
@@ -85,11 +84,6 @@ class CreateAlt extends AltController
         $entityManager->persist($alt);
         $entityManager->flush();
 
-        $serializer = new Serializer([new CreateUpdateAltNormalizer]);
-        $data = $serializer->normalize([
-            "alt" => $alt
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $alt], [new CreateUpdateAltNormalizer]);
     }
 }

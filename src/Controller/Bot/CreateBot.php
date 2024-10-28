@@ -10,7 +10,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\EntityRepository;
 use App\Repository\ShowRepository;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\Bot\CreateUpdateBotNormalizer;
 use App\Repository\FactionRepository;
 use App\Entity\Membership;
@@ -101,14 +100,14 @@ class CreateBot extends BotController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     $value["value"] = $value["default"];
                 }
             }
             if(gettype($value["value"]) != $value["type"]){
-                return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
             }
             else{
                 if($value["type"] === "array" && count($value["value"]) > 0){
@@ -116,7 +115,7 @@ class CreateBot extends BotController
                         foreach($value["params"] as $key => &$val){
                             if(!array_key_exists($key, $arr)){
                                 if(!$value["params"][$key]["nullable"]){
-                                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                                 }
                                 else{
                                     $val = $value["params"][$key]["default"];
@@ -124,7 +123,7 @@ class CreateBot extends BotController
                             }
 
                             if(gettype($arr[$key]) != $value["params"][$key]["type"]){
-                                return new Response("Parameter `{$key}` is in incorrect type format, `{$value["params"][$key]["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                                return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["params"][$key]["type"]}` is needed");
                             }
                         }
                     }
@@ -134,12 +133,12 @@ class CreateBot extends BotController
         
         $entity = $entityRepository->find($params["entityId"]["value"]);
         if($entity === null){
-            return new Response("This entity doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Entity not found");
         }
         
         $show = $showRepository->find($params["showId"]["value"]);
         if($show === null){
-            return new Response("This show doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Show not found");
         }
 
         $memberships = new ArrayCollection();
@@ -147,7 +146,7 @@ class CreateBot extends BotController
             foreach($params["faction"]["value"] as $arr){
                 $faction = $factionRepository->findOneBy(array("faction_name" => $arr["name"]));
                 if($faction === null){
-                    return new Response("This faction doesn't exist : `{$arr["name"]}`", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Faction not found");
                 }
                 else{
                     $membership = new Membership();
@@ -165,7 +164,7 @@ class CreateBot extends BotController
                 "entity" => $entity, 
                 "show" => $show
         ))){
-            return new Response("This bot already exist");
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "This Bot already exist with those parameters");
         }
 
         $transformation_count = $params["alt_to_robot"]["value"] + $params["robot_to_alt"]["value"];
@@ -191,11 +190,6 @@ class CreateBot extends BotController
             }
         }
 
-        $serializer = new Serializer([new CreateUpdateBotNormalizer]);
-        $data = $serializer->normalize([
-            "bot" => $bot
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $bot], [new CreateUpdateBotNormalizer]);
     }
 }

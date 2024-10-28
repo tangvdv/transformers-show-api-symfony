@@ -9,7 +9,6 @@ use App\Entity\ScreenTime;
 use App\Normalizer\ScreenTime\CreateScreenTimeNormalizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Serializer;
 use App\Repository\ArtefactRepository;
 use App\Repository\BotRepository;
 use App\Repository\HumanRepository;
@@ -27,7 +26,7 @@ class CreateScreenTime extends ScreenTimeController
     {
         $artefact = $artefactRepository->find($artefactId);
         if(!$artefact){
-            return new Response("This artefact doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Artefact not found");
         }
         else{
             $screentime = $this->prepareScreentime($request);
@@ -41,14 +40,8 @@ class CreateScreenTime extends ScreenTimeController
             $entityManager->persist($screentime);
             $entityManager->persist($artefact);
             $entityManager->flush();
-            
-    
-            $serializer = new Serializer([new CreateScreenTimeNormalizer]);
-            $data = $serializer->normalize([
-                "screen_time" => $screentime
-            ], "json", ["filter" => "artefact"]);
-            $json = $this->serializer->serialize($data, 'json');
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+        
+            return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $screentime], [new CreateScreenTimeNormalizer], ["filter" => "artefact"]);
         }
     }
 
@@ -63,7 +56,7 @@ class CreateScreenTime extends ScreenTimeController
     {
         $bot = $botRepository->find($botId);
         if(!$bot){
-            return new Response("This bot doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Bot not found");
         }
         else{
             $screentime = $this->prepareScreentime($request);
@@ -78,13 +71,7 @@ class CreateScreenTime extends ScreenTimeController
             $entityManager->persist($bot);
             $entityManager->flush();
             
-    
-            $serializer = new Serializer([new CreateScreenTimeNormalizer]);
-            $data = $serializer->normalize([
-                "screen_time" => $screentime
-            ], "json", ["filter" => "bot"]);
-            $json = $this->serializer->serialize($data, 'json');
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $screentime], [new CreateScreenTimeNormalizer], ["filter" => "bot"]);
         }
     }
 
@@ -99,7 +86,7 @@ class CreateScreenTime extends ScreenTimeController
     {
         $human = $humanRepository->find($humanId);
         if(!$human){
-            return new Response("This human doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Human not found");
         }
         else{
             $screentime = $this->prepareScreentime($request);
@@ -114,13 +101,7 @@ class CreateScreenTime extends ScreenTimeController
             $entityManager->persist($human);
             $entityManager->flush();
             
-    
-            $serializer = new Serializer([new CreateScreenTimeNormalizer]);
-            $data = $serializer->normalize([
-                "screen_time" => $screentime
-            ], "json", ["filter" => "human"]);
-            $json = $this->serializer->serialize($data, 'json');
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $screentime], [new CreateScreenTimeNormalizer], ["filter" => "human"]);
         }
     }
 
@@ -153,12 +134,12 @@ class CreateScreenTime extends ScreenTimeController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
                 else{
                     if(array_key_exists("method", $value)){

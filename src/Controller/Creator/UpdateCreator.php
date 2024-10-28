@@ -25,12 +25,7 @@ class UpdateCreator extends CreatorController
         $creator = $this->creatorRepository->findOneWithParams(array("id" => $id));
 
         if(!$creator){
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Creator not found");
         }
 
         $categories = ["producer", "writer", "composer", "director"];
@@ -59,7 +54,7 @@ class UpdateCreator extends CreatorController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     if(array_key_exists("default", $value)){
@@ -69,7 +64,7 @@ class UpdateCreator extends CreatorController
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
                 else{
                     if(array_key_exists("method", $value)){
@@ -82,14 +77,14 @@ class UpdateCreator extends CreatorController
 
         if($params["category"]["value"] !== null){
             if(!in_array($params["category"]["value"], $categories)){
-                return new Response("Parameter `category` has incorrect value. `producer`, `director`, `writer` or `composer` is authorized", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `category` has incorrect value. `producer`, `director`, `writer` or `composer` is authorized");
             }
             $creator->setCategory($params["category"]["value"]);
         }
         
         if($params["first_name"]["value"] !== $params["first_name"]["default"] || $params["last_name"]["value"] !== $params["last_name"]["default"]){
             if($this->creatorRepository->findOneBy(array("creator_firstname" => $params["first_name"]["value"], "creator_lastname" => $params["last_name"]["value"]))){
-                return new Response("An creator with this name already exist", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "A creator with this name already exist");;
             }
             $creator->setCreatorFirstname($params["first_name"]["value"])
                 ->setCreatorLastname($params["last_name"]["value"]);
@@ -98,11 +93,6 @@ class UpdateCreator extends CreatorController
         $entityManager->persist($creator);
         $entityManager->flush();
 
-        $serializer = new Serializer([new CreateUpdateCreatorNormalizer]);
-        $data = $serializer->normalize([
-            "creator" => $creator
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $creator], [new CreateUpdateCreatorNormalizer]);
     }
 }

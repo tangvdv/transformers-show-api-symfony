@@ -2,9 +2,9 @@
 // src/Controller/Artefact/GetAllArtefacts.php
 namespace App\Controller\Artefact;
 
+use App\Entity\Artefact;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use App\Normalizer\Artefact\ArtefactNormalizer;
 
@@ -25,7 +25,7 @@ class GetAllArtefacts extends ArtefactController
                 $limit = $request->query->getInt('limit');
             }
             else{
-                return new Response("Parameter `limit` is in incorrect type format, `integer` is needed", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `limit` is in incorrect type format, `integer` is needed");
             }
         }
 
@@ -36,22 +36,15 @@ class GetAllArtefacts extends ArtefactController
         $artefacts = $this->artefactRepository->findAllWithParams($limit, $show);
 
         if($artefacts){
-            $serializer = new Serializer([new ArtefactNormalizer]);
-            $data = $serializer->normalize([
-                "artefact_total" => count($artefacts),
+            $data = [
+                "total" => count($artefacts),
                 "limit" => $limit,
-                "artefacts" => $artefacts
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+                "items" => $artefacts
+            ];
+            return $this->responseHandler->createResponse(Response::HTTP_OK, $data, [new ArtefactNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createResponse(Response::HTTP_OK);
         }
     }
 }

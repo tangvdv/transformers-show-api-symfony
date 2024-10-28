@@ -6,6 +6,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use App\Normalizer\User\UserNormalizer;
 
 class GetMe extends UserController
 {
@@ -25,16 +26,10 @@ class GetMe extends UserController
         }
 
         if($user){
-            $json = $this->serializer->serialize($user, 'json');
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $user], [new UserNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 401,
-                    "message" => "Unauthorized"
-                ]]), 401, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_UNAUTHORIZED, "Unauthorized");
         }
     }
 }

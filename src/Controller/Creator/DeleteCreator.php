@@ -24,15 +24,10 @@ class DeleteCreator extends CreatorController
             $entityManager->remove($creator);
             $entityManager->flush();
 
-            return new Response("This creator is deleted", 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_NO_CONTENT);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Creator not found");
         }
     }
 }

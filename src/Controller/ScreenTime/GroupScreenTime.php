@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Normalizer\ScreenTime\CreateScreenTimeNormalizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Serializer;
 use App\Repository\ArtefactRepository;
 use App\Repository\BotRepository;
 use App\Repository\HumanRepository;
@@ -26,10 +25,10 @@ class GroupScreenTime extends ScreenTimeController
         $artefact = $artefactRepository->find($artefactId);
         $screentime = $this->screenTimeRepository->find($screentimeId);
         if(!$screentime){
-            return new Response("This screen time doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Screen Time not found");
         }
         if(!$artefact){
-            return new Response("This artefact doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Artefact not found");
         }
         else{
             $artefact->setScreenTime($screentime);
@@ -38,14 +37,8 @@ class GroupScreenTime extends ScreenTimeController
             $entityManager->persist($screentime);
             $entityManager->persist($artefact);
             $entityManager->flush();
-            
-    
-            $serializer = new Serializer([new CreateScreenTimeNormalizer]);
-            $data = $serializer->normalize([
-                "screen_time" => $screentime
-            ], "json", ["filter" => "artefact"]);
-            $json = $this->serializer->serialize($data, 'json');
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+        
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $screentime], [new CreateScreenTimeNormalizer], ["filter" => "artefact"]);
         }
     }
 
@@ -61,10 +54,10 @@ class GroupScreenTime extends ScreenTimeController
         $bot = $botRepository->find($botId);
         $screentime = $this->screenTimeRepository->find($screentimeId);
         if(!$screentime){
-            return new Response("This screen time doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Screen Time not found");
         }
         if(!$bot){
-            return new Response("This bot doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Bot not found");
         }
         else{
             $bot->setScreenTime($screentime);
@@ -74,13 +67,7 @@ class GroupScreenTime extends ScreenTimeController
             $entityManager->persist($bot);
             $entityManager->flush();
             
-    
-            $serializer = new Serializer([new CreateScreenTimeNormalizer]);
-            $data = $serializer->normalize([
-                "screen_time" => $screentime
-            ], "json", ["filter" => "bot"]);
-            $json = $this->serializer->serialize($data, 'json');
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $screentime], [new CreateScreenTimeNormalizer], ["filter" => "bot"]);
         }
     }
 
@@ -96,10 +83,10 @@ class GroupScreenTime extends ScreenTimeController
         $human = $humanRepository->find($humanId);
         $screentime = $this->screenTimeRepository->find($screentimeId);
         if(!$screentime){
-            return new Response("This screen time doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Screen Time not found");
         }
         if(!$human){
-            return new Response("This human doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Human not found");
         }
         else{
             $human->setScreenTime($screentime);
@@ -109,13 +96,7 @@ class GroupScreenTime extends ScreenTimeController
             $entityManager->persist($human);
             $entityManager->flush();
             
-    
-            $serializer = new Serializer([new CreateScreenTimeNormalizer]);
-            $data = $serializer->normalize([
-                "screen_time" => $screentime
-            ], "json", ["filter" => "human"]);
-            $json = $this->serializer->serialize($data, 'json');
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $screentime], [new CreateScreenTimeNormalizer], ["filter" => "human"]);
         }
     }
 }

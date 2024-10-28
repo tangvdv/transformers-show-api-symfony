@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Serializer;
 use App\Entity\Artist;
 use App\Normalizer\Artist\ArtistNormalizer;
 
@@ -44,7 +43,7 @@ class CreateArtist extends ArtistController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     if(array_key_exists("default", $value)){
@@ -54,7 +53,7 @@ class CreateArtist extends ArtistController
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST,"Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
             }
         }
@@ -64,7 +63,7 @@ class CreateArtist extends ArtistController
                 "artist_firstname" => $params["first_name"]["value"], 
                 "artist_lastname" => $params["last_name"]["value"]
         ))){
-            return new Response("This artist already exist");
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "An Artist with this name already exist");
         }
 
         $artist = new Artist();
@@ -75,11 +74,6 @@ class CreateArtist extends ArtistController
         $entityManager->persist($artist);
         $entityManager->flush();
 
-        $serializer = new Serializer([new ArtistNormalizer]);
-        $data = $serializer->normalize([
-            "artist" => $artist
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $artist], [new ArtistNormalizer]);
     }
 }

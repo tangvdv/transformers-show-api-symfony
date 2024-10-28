@@ -5,7 +5,6 @@ namespace App\Controller\Artist;
 use App\Normalizer\Artist\GetArtistNormalizer;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class GetArtist extends ArtistController
@@ -22,20 +21,10 @@ class GetArtist extends ArtistController
         $artist = $this->artistRepository->findOneWithParams(array("id" => $id));
         
         if($artist){
-            $serializer = new Serializer([new GetArtistNormalizer]);
-            $data = $serializer->normalize([
-                "artist" => $artist
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $artist], [new GetArtistNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Artist not found");
         }
     }
 }

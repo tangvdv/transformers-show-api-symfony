@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Entity;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\Entity\EntityNormalizer;
 
 class CreateEntity extends EntityController
@@ -47,12 +46,12 @@ class CreateEntity extends EntityController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
                 else{
                     if(array_key_exists("method", $value)){
@@ -64,7 +63,7 @@ class CreateEntity extends EntityController
         }
 
         if($this->entityRepository->findOneBy(array("entity_name" => $params["name"]["value"]))){
-            return new Response("An entity with this name already exist", 400, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "An Entity with this name already exist");
         }
 
         $entity->setEntityName($params["name"]["value"]);
@@ -72,11 +71,6 @@ class CreateEntity extends EntityController
         $entityManager->persist($entity);
         $entityManager->flush();
 
-        $serializer = new Serializer([new EntityNormalizer]);
-        $data = $serializer->normalize([
-            "entity" => $entity
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $entity], [new EntityNormalizer]);
     }
 }

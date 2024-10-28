@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Show;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\Show\CreateUpdateShowNormalizer;
 
 class CreateShow extends ShowController
@@ -69,7 +68,7 @@ class CreateShow extends ShowController
 
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     $value["value"] = $value["default"];
@@ -77,7 +76,7 @@ class CreateShow extends ShowController
             }
 
             if(gettype($value["value"]) != $value["type"]){
-                return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
             }
             else{
                 if($value["type"] === "string"){
@@ -87,7 +86,7 @@ class CreateShow extends ShowController
         }
 
         if($this->showRepository->findOneBy(array("show_name" => $params["name"]["value"]))){
-            return new Response("This show already exist", 400, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "A Show with this name already exist");
         }
 
         $show = new Show();
@@ -102,11 +101,6 @@ class CreateShow extends ShowController
         $entityManager->persist($show);
         $entityManager->flush();
 
-        $serializer = new Serializer([new CreateUpdateShowNormalizer]);
-        $data = $serializer->normalize([
-            "show" => $show
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $show], [new CreateUpdateShowNormalizer]);
     }
 }

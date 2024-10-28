@@ -11,28 +11,23 @@ class DeleteVoiceActor extends VoiceActorController
 {
     #[Route(
         '/api/voiceactor/{id}',
-        name: 'delete_voiceactor',
+        name: 'delete_voice_actor',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']
     )]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
     public function __invoke(int $id, EntityManagerInterface $entityManager): Response
     {
-        $voice_actor = $this->voiceactorRepository->findOneWithParams(array("id" => $id));
+        $voiceactor = $this->voiceactorRepository->findOneWithParams(array("id" => $id));
 
-        if($voice_actor){
-            $entityManager->remove($voice_actor);
+        if($voiceactor){
+            $entityManager->remove($voiceactor);
             $entityManager->flush();
 
-            return new Response("This voice actor is deleted", 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_NO_CONTENT);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Voice Actor not found");
         }
     }
 }

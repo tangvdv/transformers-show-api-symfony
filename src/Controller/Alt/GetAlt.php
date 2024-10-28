@@ -4,7 +4,6 @@ namespace App\Controller\Alt;
 
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\Alt\AltNormalizer;
 
 class GetAlt extends AltController
@@ -36,20 +35,10 @@ class GetAlt extends AltController
     private function response(mixed $alt): Response
     {
         if($alt){
-            $serializer = new Serializer([new AltNormalizer]);
-            $data = $serializer->normalize([
-                "alt" => $alt
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $alt], [new AltNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Alt not found");
         }
     }
 }

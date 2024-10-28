@@ -5,8 +5,8 @@ namespace App\Controller\Alt;
 use App\Normalizer\Alt\AltNormalizer;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
+use App\Controller\ResponseHandler;
 
 class GetAllAlts extends AltController
 {
@@ -15,7 +15,7 @@ class GetAllAlts extends AltController
         name: 'get_alts',
         methods: ['GET']
     )]
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request, ResponseHandler $responseHandler): Response
     {
         $limit = 10;
         $bot = null;
@@ -25,7 +25,7 @@ class GetAllAlts extends AltController
                 $limit = $request->query->getInt('limit');
             }
             else{
-                return new Response("Parameter `limit` is in incorrect type format, `integer` is needed", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `limit` is in incorrect type format, `integer` is needed");
             }
         }
 
@@ -36,22 +36,15 @@ class GetAllAlts extends AltController
         $alts = $this->altRepository->findAllWithParams($limit, $bot);
 
         if($alts){
-            $serializer = new Serializer([new AltNormalizer]);
-            $data = $serializer->normalize([
-                "alt_total" => count($alts),
+            $data = [
+                "total" => count($alts),
                 "limit" => $limit,
-                "alts" => $alts
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+                "items" => $alts
+            ];
+            return $responseHandler->createResponse(Response::HTTP_OK, $data, [new AltNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $responseHandler->createResponse(Response::HTTP_OK);
         }
     }
 }

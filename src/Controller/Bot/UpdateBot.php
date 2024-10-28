@@ -13,7 +13,6 @@ use App\Entity\Membership;
 use App\Repository\FactionRepository;
 use App\Repository\ShowRepository;
 use App\Repository\EntityRepository;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\Bot\CreateUpdateBotNormalizer;
 use App\Repository\ScreenTimeRepository;
 
@@ -31,12 +30,7 @@ class UpdateBot extends BotController
         $bot = $this->botRepository->findOneWithParams(array("id" => $id));
 
         if(!$bot){
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Bot not found");
         }
 
         $payload = $request->getPayload();
@@ -121,7 +115,7 @@ class UpdateBot extends BotController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     if(array_key_exists("default", $value)){
@@ -131,7 +125,7 @@ class UpdateBot extends BotController
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
                 else{
                     if($value["type"] === "array" && count($value["value"]) > 0){
@@ -139,7 +133,7 @@ class UpdateBot extends BotController
                             foreach($value["params"] as $key => &$val){
                                 if(!array_key_exists($key, $arr)){
                                     if(!$value["params"][$key]["nullable"]){
-                                        return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                                        return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                                     }
                                     else{
                                         $val = $value["params"][$key]["default"];
@@ -147,7 +141,7 @@ class UpdateBot extends BotController
                                 }
     
                                 if(gettype($arr[$key]) != $value["params"][$key]["type"]){
-                                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["params"][$key]["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["params"][$key]["type"]}` is needed");
                                 }
                             }
                         }
@@ -165,7 +159,7 @@ class UpdateBot extends BotController
         if($params["screen_time"]["value"] !== null){
             $screen_time = $screenTimeRepository->find($params["screen_time"]["value"]);
             if($screen_time === null){
-                return new Response("This screen time doesn't exist", 404, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Screen Time not found");
             }
             else{
                 $bot->setScreenTime($screen_time);
@@ -176,16 +170,16 @@ class UpdateBot extends BotController
         if($params["entityId"]["value"] !== $params["entityId"]["default"] && $params["showId"]["value"] !== $params["showId"]["default"]){
           $entity = $entityRepository->find($params["entityId"]["value"]);
             if($entity === null){
-                return new Response("This entity doesn't exist", 404, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Entity not found");
             }
 
             $show = $showRepository->find($params["showId"]["value"]);
             if($show === null){
-                return new Response("This show doesn't exist", 404, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Show not found");
             }
 
             if($this->botRepository->findOneBy(array("entity" => $entity, "show" => $show))){
-                return new Response("An entity already exist in this show", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "An Entity already exist in this Show");
             }
             else{
                 $bot->setShow($show)
@@ -200,7 +194,7 @@ class UpdateBot extends BotController
             foreach($params["faction"]["value"] as $arr){
                 $faction = $factionRepository->findOneBy(array("faction_name" => $arr["name"]));
                 if($faction === null){
-                    return new Response("This faction doesn't exist : `{$arr["name"]}`", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Faction not found");
                 }
                 else{
                     $membership = new Membership();
@@ -258,11 +252,6 @@ class UpdateBot extends BotController
         $entityManager->persist($bot);
         $entityManager->flush();
 
-        $serializer = new Serializer([new CreateUpdateBotNormalizer]);
-        $data = $serializer->normalize([
-            "bot" => $bot
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $bot], [new CreateUpdateBotNormalizer]);
     }
 }

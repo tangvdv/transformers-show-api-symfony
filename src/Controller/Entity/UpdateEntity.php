@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\Entity\EntityNormalizer;
 
 class UpdateEntity extends EntityController
@@ -24,12 +23,7 @@ class UpdateEntity extends EntityController
         $entity = $this->entityRepository->findOneBy(array("id" => $id));
 
         if(!$entity){
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Entity not found");
         }
         $payload = $request->getPayload();
         $params = [
@@ -56,7 +50,7 @@ class UpdateEntity extends EntityController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     if(array_key_exists("default", $value)){
@@ -66,7 +60,7 @@ class UpdateEntity extends EntityController
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
                 else{
                     if(array_key_exists("method", $value)){
@@ -80,7 +74,7 @@ class UpdateEntity extends EntityController
 
         if($params["name"]["value"] !== $params["name"]["default"]){
             if($this->entityRepository->findOneBy(array("entity_name" => $params["name"]["value"]))){
-                return new Response("An entity with this name already exist", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "An Entity with this name already exist");
             }
             $entity->setEntityName($params["name"]["value"]);
         }
@@ -88,11 +82,6 @@ class UpdateEntity extends EntityController
         $entityManager->persist($entity);
         $entityManager->flush();
 
-        $serializer = new Serializer([new EntityNormalizer]);
-        $data = $serializer->normalize([
-            "entity" => $entity
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $entity], [new EntityNormalizer]);
     }
 }

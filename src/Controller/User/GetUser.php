@@ -5,6 +5,7 @@ namespace App\Controller\User;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Normalizer\User\UserNormalizer;
 
 class GetUser extends UserController
 {
@@ -19,16 +20,10 @@ class GetUser extends UserController
         $user = $this->userRepository->findOneBy(array("id" => $id));
 
         if($user){
-            $json = $this->serializer->serialize($user, 'json');
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $user], [new UserNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 401,
-                    "message" => "Unauthorized"
-                ]]), 401, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createResponse(Response::HTTP_NOT_FOUND, "User not found");
         }
     }
 }

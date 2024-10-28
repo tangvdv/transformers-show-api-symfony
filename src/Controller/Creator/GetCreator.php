@@ -5,7 +5,6 @@ namespace App\Controller\Creator;
 use App\Normalizer\Creator\CreatorNormalizer;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 
 class GetCreator extends CreatorController
 {
@@ -36,20 +35,10 @@ class GetCreator extends CreatorController
     private function response(mixed $creator): Response
     {
         if($creator){
-            $serializer = new Serializer([new CreatorNormalizer]);
-            $data = $serializer->normalize([
-                "creator" => $creator
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $creator], [new CreatorNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Creator not found");
         }
     }
 }

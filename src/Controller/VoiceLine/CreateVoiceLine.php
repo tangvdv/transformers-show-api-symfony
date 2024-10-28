@@ -10,7 +10,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\EntityRepository;
 use App\Repository\ShowRepository;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\VoiceLine\VoiceLineNormalizer;
 
 class CreateVoiceLine extends VoiceLineController
@@ -52,12 +51,12 @@ class CreateVoiceLine extends VoiceLineController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
                 else{
                     if(array_key_exists("method", $value)){
@@ -70,16 +69,16 @@ class CreateVoiceLine extends VoiceLineController
         
         $entity = $entityRepository->find($params["entityId"]["value"]);
         if($entity === null){
-            return new Response("This entity doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Entity not found");
         }
         
         $show = $showRepository->find($params["showId"]["value"]);
         if($show === null){
-            return new Response("This show doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Show not found");
         }
 
         if($this->voiceLineRepository->findOneBy(array("show" => $show, "entity" => $entity, "number" => $params["number"]["value"]))){
-            return new Response("A voice line with this number already exist with this bot in this show", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "A Voice Line with this number already exist with this Bot in this Show");
         }
 
         $voiceline
@@ -91,11 +90,6 @@ class CreateVoiceLine extends VoiceLineController
         $entityManager->persist($voiceline);
         $entityManager->flush();
 
-        $serializer = new Serializer([new VoiceLineNormalizer]);
-        $data = $serializer->normalize([
-            "voice_line" => $voiceline
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_CREATED, ["items" => $voiceline], [new VoiceLineNormalizer]);
     }
 }

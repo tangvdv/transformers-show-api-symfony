@@ -4,7 +4,6 @@ namespace App\Controller\ConceptArt;
 
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\ConceptArt\ConceptArtNormalizer;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -52,20 +51,10 @@ class GetConceptArt extends ConceptArtController
     private function response(mixed $conceptart): Response
     {
         if($conceptart){
-            $serializer = new Serializer([new ConceptArtNormalizer]);
-            $data = $serializer->normalize([
-                "concept_art" => $conceptart
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $conceptart], [new ConceptArtNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Concept Art not found");
         }
     }
 }

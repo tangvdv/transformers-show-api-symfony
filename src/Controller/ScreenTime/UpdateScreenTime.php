@@ -24,12 +24,7 @@ class UpdateScreenTime extends ScreenTimeController
         $screentime = $this->screenTimeRepository->findOneBy(array("id" => $id));
 
         if(!$screentime){
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Screen Time not found");
         }
         $payload = $request->getPayload();
         $params = [
@@ -61,7 +56,7 @@ class UpdateScreenTime extends ScreenTimeController
         foreach($params as $key => &$value){
             if($value["value"] === null){
                 if(!$value["nullable"]){
-                    return new Response("Parameter `{$key}` is missing", 404, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Parameter `{$key}` is missing");
                 }
                 else{
                     if(array_key_exists("default", $value)){
@@ -71,7 +66,7 @@ class UpdateScreenTime extends ScreenTimeController
             }
             else{
                 if(gettype($value["value"]) != $value["type"]){
-                    return new Response("Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed", 400, ['Content-Type', 'application/json']);
+                    return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `{$key}` is in incorrect type format, `{$value["type"]}` is needed");
                 }
                 else{
                     if(array_key_exists("method", $value)){
@@ -94,11 +89,6 @@ class UpdateScreenTime extends ScreenTimeController
         $entityManager->persist($screentime);
         $entityManager->flush();
 
-        $serializer = new Serializer([new ScreenTimeNormalizer]);
-        $data = $serializer->normalize([
-            "screen_time" => $screentime
-        ], "json");
-        $json = $this->serializer->serialize($data, 'json');
-        return new Response($json, 200, ['Content-Type', 'application/json']);
+        return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $screentime], [new ScreenTimeNormalizer]);
     }
 }

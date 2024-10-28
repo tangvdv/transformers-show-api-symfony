@@ -5,8 +5,6 @@ namespace App\Controller\Actor;
 use App\Normalizer\Actor\ActorNormalizer;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\HttpFoundation\Request;
 
 class GetActor extends ActorController
 {
@@ -28,7 +26,7 @@ class GetActor extends ActorController
         methods: ['GET'],
         requirements: ['name' => '\w+']
     )]
-    public function getActorByName(string $name, Request $request): Response
+    public function getActorByName(string $name): Response
     {
         $actor = $this->actorRepository->findOneWithParams(array("name" => $name));
         return $this->response($actor);
@@ -37,20 +35,10 @@ class GetActor extends ActorController
     private function response(mixed $actor): Response
     {
         if($actor){
-            $serializer = new Serializer([new ActorNormalizer]);
-            $data = $serializer->normalize([
-                "actor" => $actor
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $actor], [new ActorNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Actor not found");
         }
     }
 }

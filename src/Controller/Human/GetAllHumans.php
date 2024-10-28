@@ -4,7 +4,6 @@ namespace App\Controller\Human;
 
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use App\Normalizer\Human\HumanNormalizer;
 
@@ -25,7 +24,7 @@ class GetAllHumans extends HumanController
                 $limit = $request->query->getInt('limit');
             }
             else{
-                return new Response("Parameter `limit` is in incorrect type format, `integer` is needed", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `limit` is in incorrect type format, `integer` is needed");
             }
         }
 
@@ -36,22 +35,15 @@ class GetAllHumans extends HumanController
         $humans = $this->humanRepository->findAllWithParams($limit, $show);
 
         if($humans){
-            $serializer = new Serializer([new HumanNormalizer]);
-            $data = $serializer->normalize([
-                "human_total" => count($humans),
+            $data = [
+                "total" => count($humans),
                 "limit" => $limit,
-                "humans" => $humans
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+                "items" => $humans
+            ];
+            return $this->responseHandler->createResponse(Response::HTTP_OK, $data, [new HumanNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createResponse(Response::HTTP_OK);
         }
     }
 }

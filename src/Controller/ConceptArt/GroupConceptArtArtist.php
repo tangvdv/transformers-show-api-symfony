@@ -5,7 +5,6 @@ namespace App\Controller\ConceptArt;
 use App\Normalizer\ConceptArt\GroupArtistConceptArtNormalizer;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 use App\Repository\ArtistRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -23,29 +22,24 @@ class GroupConceptArtArtist extends ConceptArtController
     {
         $conceptart = $this->conceptArtRepository->find($conceptartId);
         if(!$conceptart){
-            return new Response("This concept art doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Concept Art not found");
         }
 
         $artist = $artistRepository->find($artistId);
         if(!$artist){
-            return new Response("This artist doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Show not found");
         }
 
         $artists = $conceptart->getArtists();
         if($artists->contains($artist)){
-            return new Response("This artist is already linked to this concept art", 400, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_CONFLICT, "This Artist is already linked to this Concept Art");
         }
         else{
             $conceptart->addArtist($artist);
             $entityManager->persist($conceptart);
             $entityManager->flush();
 
-            $serializer = new Serializer([new GroupArtistConceptArtNormalizer]);
-            $data = $serializer->normalize([
-                "concept_art" => $conceptart
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $conceptart], [new GroupArtistConceptArtNormalizer]);
         }
     }
 
@@ -60,24 +54,24 @@ class GroupConceptArtArtist extends ConceptArtController
     {
         $conceptart = $this->conceptArtRepository->find($conceptartId);
         if(!$conceptart){
-            return new Response("This concept art doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Concept Art not found");
         }
 
         $artist = $artistRepository->find($artistId);
         if(!$artist){
-            return new Response("This artist doesn't exist", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Artist not found");
         }
 
         $artists = $conceptart->getArtists();
         if(!$artists->contains($artist)){
-            return new Response("No link found between this artist and this concept art", 404, ['Content-Type', 'application/json']);
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "No link found between this Artist and this Concept Art");
         }
         else{
             $conceptart->removeArtist($artist);
             $entityManager->persist($conceptart);
             $entityManager->flush();
             
-            return new Response("This artist has been removed from this concept art successfully");
+            return $this->responseHandler->createResponse(Response::HTTP_NO_CONTENT);
         }
     }
 }

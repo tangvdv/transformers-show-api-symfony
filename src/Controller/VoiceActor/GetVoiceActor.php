@@ -5,13 +5,12 @@ namespace App\Controller\VoiceActor;
 use App\Normalizer\VoiceActor\VoiceActorNormalizer;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 
 class GetVoiceActor extends VoiceActorController
 {
     #[Route(
         '/api/voiceactor/{id}',
-        name: 'get_voiceactor_id',
+        name: 'get_voice_actor_id',
         methods: ['GET'],
         requirements: ['id' => '\d+']
     )]
@@ -23,33 +22,23 @@ class GetVoiceActor extends VoiceActorController
 
     #[Route(
         '/api/voiceactor/{name}',
-        name: 'get_voiceactor_name',
+        name: 'get_voice_actor_name',
         methods: ['GET'],
         requirements: ['name' => '\w+']
     )]
     public function getVoiceActorByName(string $name): Response
     {
-        $voice_actor = $this->voiceactorRepository->findOneWithParams(array("name" => $name));
-        return $this->response($voice_actor);
+        $voiceactor = $this->voiceactorRepository->findOneWithParams(array("name" => $name));
+        return $this->response($voiceactor);
     }
 
-    private function response(mixed $voice_actor): Response
+    private function response(mixed $voiceactor): Response
     {
-        if($voice_actor){
-            $serializer = new Serializer([new VoiceActorNormalizer]);
-            $data = $serializer->normalize([
-                "voiceactor" => $voice_actor
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+        if($voiceactor){
+            return $this->responseHandler->createResponse(Response::HTTP_OK, ["items" => $voiceactor], [new VoiceActorNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Voice Actor not found");
         }
     }
 }

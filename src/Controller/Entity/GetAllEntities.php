@@ -4,7 +4,6 @@ namespace App\Controller\Entity;
 
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use App\Normalizer\Entity\EntityNormalizer;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -26,29 +25,22 @@ class GetAllEntities extends EntityController
                 $limit = $request->query->getInt('limit');
             }
             else{
-                return new Response("Parameter `limit` is in incorrect type format, `integer` is needed", 400, ['Content-Type', 'application/json']);
+                return $this->responseHandler->createErrorResponse(Response::HTTP_BAD_REQUEST, "Parameter `limit` is in incorrect type format, `integer` is needed");
             }
         }
 
         $entities = $this->entityRepository->findAllWithParams($limit);
 
         if($entities){
-            $serializer = new Serializer([new EntityNormalizer]);
-            $data = $serializer->normalize([
-                "entity_total" => count($entities),
+            $data = [
+                "total" => count($entities),
                 "limit" => $limit,
-                "entities" => $entities
-            ], "json");
-            $json = $this->serializer->serialize($data, "json");
-            return new Response($json, 200, ['Content-Type', 'application/json']);
+                "items" => $entities
+            ];
+            return $this->responseHandler->createResponse(Response::HTTP_OK, $data, [new EntityNormalizer]);
         }
         else{
-            return new Response(json_encode([
-                "Error" => [
-                    "code" => 404,
-                    "message" => "Couldn't find any data."
-                ]]), 404, ['Content-Type', 'application/json']
-            );
+            return $this->responseHandler->createResponse(Response::HTTP_OK);
         }
     }
 }
