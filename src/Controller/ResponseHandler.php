@@ -7,11 +7,11 @@ use Symfony\Component\Serializer\Serializer;
 
 class ResponseHandler extends Controller
 {
-    public function createResponse(int $statusCode, mixed $data = [], array $normalizers = []): Response
+    public function createResponse(int $statusCode, mixed $data = [], array $normalizers = [], array $filter = []): Response
     {
         if(count($normalizers) > 0){
             $serializer = new Serializer($normalizers);
-            $data = $serializer->normalize($data, "json");
+            $data = $serializer->normalize($data, "json", $filter);
         }
 
         $arr = [
