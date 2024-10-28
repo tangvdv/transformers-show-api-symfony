@@ -12,7 +12,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class GroupVoiceActorBot extends VoiceActorController
 {
     #[Route(
-        '/api/voiceactor/{voiceactorId}/{botId}',
+        '/api/voiceactors/{voiceactorId}/bots/{botId}',
         name: 'group_voice_actor_bot',
         methods: ['POST'],
         requirements: ['voiceactorId' => '\d+', 'botId' => '\d+']
@@ -44,7 +44,7 @@ class GroupVoiceActorBot extends VoiceActorController
     }
 
     #[Route(
-        '/api/voiceactor/{voiceactorId}/{botId}',
+        '/api/voiceactors/{voiceactorId}/bots/{botId}',
         name: 'ungroup_voice_actor_bot',
         methods: ['DELETE'],
         requirements: ['voiceactorId' => '\d+', 'botId' => '\d+']

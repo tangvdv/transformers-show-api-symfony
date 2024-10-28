@@ -18,7 +18,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class CreateBot extends BotController
 {
     #[Route(
-        '/api/bot',
+        '/api/bots',
         name: 'create_bot',
         methods: ['POST']
     )]

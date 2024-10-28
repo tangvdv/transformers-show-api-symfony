@@ -9,7 +9,7 @@ use App\Normalizer\Show\ShowNormalizer;
 class GetShow extends ShowController
 {
     #[Route(
-        '/api/show/{id}',
+        '/api/shows/{id}',
         name: 'get_show_id',
         methods: ['GET'],
         requirements: ['id' => '\d+']
@@ -21,7 +21,7 @@ class GetShow extends ShowController
     }
 
     #[Route(
-        '/api/show/{name}',
+        '/api/shows/{name}',
         name: 'get_show_name',
         methods: ['GET'],
         requirements: ['name' => '\w+']

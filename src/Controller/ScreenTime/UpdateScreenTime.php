@@ -13,7 +13,7 @@ use App\Normalizer\ScreenTime\ScreenTimeNormalizer;
 class UpdateScreenTime extends ScreenTimeController
 {
     #[Route(
-        '/api/screentime/{id}',
+        '/api/screentimes/{id}',
         name: 'update_screen_time',
         methods: ['PUT'],
         requirements: ['id' => '\d+']

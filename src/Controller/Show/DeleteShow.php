@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DeleteShow extends ShowController
 {
     #[Route(
-        '/api/show/{id}',
+        '/api/shows/{id}',
         name: 'delete_show',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']

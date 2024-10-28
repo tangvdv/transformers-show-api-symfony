@@ -13,7 +13,7 @@ use App\Repository\NationalityRepository;
 class UpdateVoiceActor extends VoiceActorController
 {
     #[Route(
-        '/api/voiceactor/{id}',
+        '/api/voiceactors/{id}',
         name: 'update_voice_actor',
         methods: ['PUT'],
         requirements: ['id' => '\d+']

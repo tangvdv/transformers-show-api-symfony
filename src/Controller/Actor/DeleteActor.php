@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DeleteActor extends ActorController
 {
     #[Route(
-        '/api/actor/{id}',
+        '/api/actors/{id}',
         name: 'delete_actor',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']

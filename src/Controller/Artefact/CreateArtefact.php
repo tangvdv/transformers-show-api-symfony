@@ -16,7 +16,7 @@ use App\Repository\ScreenTimeRepository;
 class CreateArtefact extends ArtefactController
 {
     #[Route(
-        '/api/artefact',
+        '/api/artefacts',
         name: 'create_artefact',
         methods: ['POST']
     )]

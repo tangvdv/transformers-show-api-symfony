@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DeleteEntity extends EntityController
 {
     #[Route(
-        '/api/entity/{id}',
+        '/api/entities/{id}',
         name: 'delete_entity',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']

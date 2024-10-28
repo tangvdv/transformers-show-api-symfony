@@ -10,7 +10,7 @@ use App\Normalizer\User\UserNormalizer;
 class GetUser extends UserController
 {
     #[Route(
-        '/api/user/{id}',
+        '/api/users/{id}',
         name: 'user',
         methods: ['GET']
     )]

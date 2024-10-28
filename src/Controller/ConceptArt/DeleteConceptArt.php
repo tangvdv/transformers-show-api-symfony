@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DeleteConceptArt extends ConceptArtController
 {
     #[Route(
-        '/api/conceptart/{id}',
+        '/api/conceptarts/{id}',
         name: 'delete_concept_art',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']

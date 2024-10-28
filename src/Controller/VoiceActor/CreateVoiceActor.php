@@ -14,7 +14,7 @@ use App\Normalizer\VoiceActor\CreateUpdateVoiceActorNormalizer;
 class CreateVoiceActor extends VoiceActorController
 {
     #[Route(
-        '/api/voiceactor',
+        '/api/voiceactors',
         name: 'create_voice_actor',
         methods: ['POST']
     )]

@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 class GetArtefact extends ArtefactController
 {
     #[Route(
-        '/api/artefact/{id}',
+        '/api/artefacts/{id}',
         name: 'get_artefact_id',
         methods: ['GET'],
         requirements: ['id' => '\d+']
@@ -22,7 +22,7 @@ class GetArtefact extends ArtefactController
     }
 
     #[Route(
-        '/api/artefact/{name}',
+        '/api/artefacts/{name}',
         name: 'get_artefact_name',
         methods: ['GET'],
         requirements: ['name' => '\w+']

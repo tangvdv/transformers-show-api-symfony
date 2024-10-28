@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DeleteVoiceLine extends VoiceLineController
 {
     #[Route(
-        '/api/voiceline/{id}',
+        '/api/voicelines/{id}',
         name: 'delete_voice_line',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']

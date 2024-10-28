@@ -17,7 +17,7 @@ use App\Repository\ScreenTimeRepository;
 class CreateHuman extends HumanController
 {
     #[Route(
-        '/api/human',
+        '/api/humans',
         name: 'create_human',
         methods: ['POST']
     )]

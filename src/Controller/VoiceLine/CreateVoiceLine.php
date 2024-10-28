@@ -15,7 +15,7 @@ use App\Normalizer\VoiceLine\VoiceLineNormalizer;
 class CreateVoiceLine extends VoiceLineController
 {
     #[Route(
-        '/api/voiceline',
+        '/api/voicelines',
         name: 'create_voice_line',
         methods: ['POST']
     )]

@@ -14,7 +14,7 @@ use App\Repository\HumanRepository;
 class GroupScreenTime extends ScreenTimeController
 {
     #[Route(
-        '/api/screentime/artefact/{screentimeId}/{artefactId}',
+        '/api/screentimes/{screentimeId}/artefacts/{artefactId}',
         name: 'group_screentime_artefact',
         methods: ['POST'],
         requirements: ['screentimeId' => '\d+', 'artefactId' => '\d+']
@@ -43,7 +43,7 @@ class GroupScreenTime extends ScreenTimeController
     }
 
     #[Route(
-        '/api/screentime/bot/{screentimeId}/{botId}',
+        '/api/screentimes/{screentimeId}/bots/{botId}',
         name: 'group_screentime_bot',
         methods: ['POST'],
         requirements: ['screentimeId' => '\d+', 'botId' => '\d+']
@@ -72,7 +72,7 @@ class GroupScreenTime extends ScreenTimeController
     }
 
     #[Route(
-        '/api/screentime/human/{screentimeId}/{humanId}',
+        '/api/screentimes/{screentimeId}/humans/{humanId}',
         name: 'group_screentime_human',
         methods: ['POST'],
         requirements: ['screentimeId' => '\d+', 'humanId' => '\d+']

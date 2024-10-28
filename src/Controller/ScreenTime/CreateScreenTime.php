@@ -16,7 +16,7 @@ use App\Repository\HumanRepository;
 class CreateScreenTime extends ScreenTimeController
 {
     #[Route(
-        '/api/screentime/artefact/{artefactId}',
+        '/api/screentimes/artefacts/{artefactId}',
         name: 'create_screentime_artefact',
         methods: ['POST'],
         requirements: ['artefactId' => '\d+']
@@ -46,7 +46,7 @@ class CreateScreenTime extends ScreenTimeController
     }
 
     #[Route(
-        '/api/screentime/bot/{botId}',
+        '/api/screentimes/bots/{botId}',
         name: 'create_screentime_bot',
         methods: ['POST'],
         requirements: ['botId' => '\d+']
@@ -76,7 +76,7 @@ class CreateScreenTime extends ScreenTimeController
     }
 
     #[Route(
-        '/api/screentime/human/{humanId}',
+        '/api/screentimes/humans/{humanId}',
         name: 'create_screentime_human',
         methods: ['POST'],
         requirements: ['humanId' => '\d+']

@@ -15,7 +15,7 @@ use App\Repository\ScreenTimeRepository;
 class UpdateArtefact extends ArtefactController
 {
     #[Route(
-        '/api/artefact/{id}',
+        '/api/artefacts/{id}',
         name: 'update_artefact',
         methods: ['PUT'],
         requirements: ['id' => '\d+']

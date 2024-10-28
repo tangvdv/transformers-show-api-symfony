@@ -14,7 +14,7 @@ use App\Normalizer\Actor\CreateUpdateActorNormalizer;
 class CreateActor extends ActorController
 {
     #[Route(
-        '/api/actor',
+        '/api/actors',
         name: 'create_actor',
         methods: ['POST']
     )]

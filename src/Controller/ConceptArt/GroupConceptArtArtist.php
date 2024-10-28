@@ -12,7 +12,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class GroupConceptArtArtist extends ConceptArtController
 {
     #[Route(
-        '/api/conceptart/{conceptartId}/{artistId}',
+        '/api/conceptarts/{conceptartId}/artists/{artistId}',
         name: 'group_concept_art_artist',
         methods: ['POST'],
         requirements: ['conceptartId' => '\d+', 'artistId' => '\d+']
@@ -44,7 +44,7 @@ class GroupConceptArtArtist extends ConceptArtController
     }
 
     #[Route(
-        '/api/conceptart/{conceptartId}/{artistId}',
+        '/api/conceptarts/{conceptartId}/artists/{artistId}',
         name: 'ungroup_concept_art_artist',
         methods: ['DELETE'],
         requirements: ['conceptartId' => '\d+', 'artistId' => '\d+']

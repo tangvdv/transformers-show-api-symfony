@@ -14,7 +14,7 @@ use App\Normalizer\VoiceLine\VoiceLineNormalizer;
 class UpdateVoiceLine extends VoiceLineController
 {
     #[Route(
-        '/api/voiceline/{id}',
+        '/api/voicelines/{id}',
         name: 'update_voice_line',
         methods: ['PUT'],
         requirements: ['id' => '\d+']

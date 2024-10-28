@@ -11,7 +11,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DeleteBot extends BotController
 {
     #[Route(
-        '/api/bot/{id}',
+        '/api/bots/{id}',
         name: 'delete_bot',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']

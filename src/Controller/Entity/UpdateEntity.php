@@ -12,7 +12,7 @@ use App\Normalizer\Entity\EntityNormalizer;
 class UpdateEntity extends EntityController
 {
     #[Route(
-        '/api/entity/{id}',
+        '/api/entities/{id}',
         name: 'update_entity',
         methods: ['PUT'],
         requirements: ['id' => '\d+']

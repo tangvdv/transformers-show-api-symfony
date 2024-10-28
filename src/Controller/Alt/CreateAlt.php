@@ -13,7 +13,7 @@ use App\Normalizer\Alt\CreateUpdateAltNormalizer;
 class CreateAlt extends AltController
 {
     #[Route(
-        '/api/alt',
+        '/api/alts',
         name: 'create_alt',
         methods: ['POST']
     )]

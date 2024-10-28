@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class GetVoiceActor extends VoiceActorController
 {
     #[Route(
-        '/api/voiceactor/{id}',
+        '/api/voiceactors/{id}',
         name: 'get_voice_actor_id',
         methods: ['GET'],
         requirements: ['id' => '\d+']
@@ -21,7 +21,7 @@ class GetVoiceActor extends VoiceActorController
     }
 
     #[Route(
-        '/api/voiceactor/{name}',
+        '/api/voiceactors/{name}',
         name: 'get_voice_actor_name',
         methods: ['GET'],
         requirements: ['name' => '\w+']

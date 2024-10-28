@@ -13,7 +13,7 @@ use App\Repository\NationalityRepository;
 class UpdateActor extends ActorController
 {
     #[Route(
-        '/api/actor/{id}',
+        '/api/actors/{id}',
         name: 'update_actor',
         methods: ['PUT'],
         requirements: ['id' => '\d+']

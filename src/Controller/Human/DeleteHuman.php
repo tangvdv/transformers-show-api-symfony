@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DeleteHuman extends HumanController
 {
     #[Route(
-        '/api/human/{id}',
+        '/api/humans/{id}',
         name: 'delete_human',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']

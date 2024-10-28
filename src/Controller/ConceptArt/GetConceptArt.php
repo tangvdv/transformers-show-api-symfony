@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 class GetConceptArt extends ConceptArtController
 {
     #[Route(
-        '/api/conceptart/{id}',
+        '/api/conceptarts/{id}',
         name: 'get_concept_art_id',
         methods: ['GET'],
         requirements: ['id' => '\d+']
@@ -22,7 +22,7 @@ class GetConceptArt extends ConceptArtController
     }
 
     #[Route(
-        '/api/conceptart/{title}',
+        '/api/conceptarts/{title}',
         name: 'get_concept_art_name',
         methods: ['GET'],
         requirements: ['title' => '\w+']

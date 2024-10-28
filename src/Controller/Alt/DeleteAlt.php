@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DeleteAlt extends AltController
 {
     #[Route(
-        '/api/alt/{id}',
+        '/api/alts/{id}',
         name: 'delete_alt',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']

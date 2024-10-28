@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class GetActor extends ActorController
 {
     #[Route(
-        '/api/actor/{id}',
+        '/api/actors/{id}',
         name: 'get_actor_id',
         methods: ['GET'],
         requirements: ['id' => '\d+']
@@ -21,7 +21,7 @@ class GetActor extends ActorController
     }
 
     #[Route(
-        '/api/actor/{name}',
+        '/api/actors/{name}',
         name: 'get_actor_name',
         methods: ['GET'],
         requirements: ['name' => '\w+']

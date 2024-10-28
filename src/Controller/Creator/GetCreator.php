@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class GetCreator extends CreatorController
 {
     #[Route(
-        '/api/creator/{id}',
+        '/api/creators/{id}',
         name: 'get_creator_id',
         methods: ['GET'],
         requirements: ['id' => '\d+']
@@ -21,7 +21,7 @@ class GetCreator extends CreatorController
     }
 
     #[Route(
-        '/api/creator/{name}',
+        '/api/creators/{name}',
         name: 'get_creator_name',
         methods: ['GET'],
         requirements: ['name' => '\w+']

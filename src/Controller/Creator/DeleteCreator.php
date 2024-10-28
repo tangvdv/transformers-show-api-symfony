@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DeleteCreator extends CreatorController
 {
     #[Route(
-        '/api/creator/{id}',
+        '/api/creators/{id}',
         name: 'delete_creator',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']

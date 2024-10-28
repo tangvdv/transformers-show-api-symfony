@@ -4,7 +4,6 @@ namespace App\Controller\Creator;
 
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 use App\Normalizer\Creator\CreatorNormalizer;
 use App\Repository\ShowRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,7 +12,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class GroupCreatorShow extends CreatorController
 {
     #[Route(
-        '/api/creator/{creatorId}/{showId}',
+        '/api/creators/{creatorId}/shows/{showId}',
         name: 'group_creator_show',
         methods: ['POST'],
         requirements: ['creatorId' => '\d+', 'showId' => '\d+']
@@ -45,7 +44,7 @@ class GroupCreatorShow extends CreatorController
     }
 
     #[Route(
-        '/api/creator/{creatorId}/{showId}',
+        '/api/creators/{creatorId}/shows/{showId}',
         name: 'ungroup_creator_show',
         methods: ['DELETE'],
         requirements: ['creatorId' => '\d+', 'showId' => '\d+']

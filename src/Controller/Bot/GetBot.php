@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 class GetBot extends BotController
 {
     #[Route(
-        '/api/bot/{id}',
+        '/api/bots/{id}',
         name: 'get_bot_id',
         methods: ['GET'],
         requirements: ['id' => '\d+']
@@ -22,7 +22,7 @@ class GetBot extends BotController
     }
 
     #[Route(
-        '/api/bot/{name}',
+        '/api/bots/{name}',
         name: 'get_bot_name',
         methods: ['GET'],
         requirements: ['name' => '\w+']

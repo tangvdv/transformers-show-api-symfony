@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DeleteArtefact extends ArtefactController
 {
     #[Route(
-        '/api/artefact/{id}',
+        '/api/artefacts/{id}',
         name: 'delete_artefact',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']

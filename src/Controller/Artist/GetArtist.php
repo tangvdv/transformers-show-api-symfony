@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class GetArtist extends ArtistController
 {
     #[Route(
-        '/api/artist/{id}',
+        '/api/artists/{id}',
         name: 'get_artist_id',
         methods: ['GET'],
         requirements: ['id' => '\d+']

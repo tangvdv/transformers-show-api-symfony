@@ -13,7 +13,7 @@ use App\Normalizer\Show\CreateUpdateShowNormalizer;
 class CreateShow extends ShowController
 {
     #[Route(
-        '/api/show',
+        '/api/shows',
         name: 'create_show',
         methods: ['POST']
     )]

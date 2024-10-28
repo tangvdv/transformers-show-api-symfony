@@ -13,7 +13,7 @@ use App\Normalizer\Artist\ArtistNormalizer;
 class CreateArtist extends ArtistController
 {
     #[Route(
-        '/api/artist',
+        '/api/artists',
         name: 'create_artist',
         methods: ['POST']
     )]

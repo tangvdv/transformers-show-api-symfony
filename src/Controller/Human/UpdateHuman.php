@@ -15,7 +15,7 @@ use App\Repository\ScreenTimeRepository;
 class UpdateHuman extends HumanController
 {
     #[Route(
-        '/api/human/{id}',
+        '/api/humans/{id}',
         name: 'update_human',
         methods: ['PUT'],
         requirements: ['id' => '\d+']

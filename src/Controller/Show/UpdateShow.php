@@ -12,7 +12,7 @@ use App\Normalizer\Show\CreateUpdateShowNormalizer;
 class UpdateShow extends ShowController
 {
     #[Route(
-        '/api/show/{id}',
+        '/api/shows/{id}',
         name: 'update_show',
         methods: ['PUT'],
         requirements: ['id' => '\d+']

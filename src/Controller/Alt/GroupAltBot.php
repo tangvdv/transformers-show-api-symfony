@@ -12,7 +12,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class GroupAltBot extends AltController
 {
     #[Route(
-        '/api/alt/{altId}/{botId}',
+        '/api/alts/{altId}/bots/{botId}',
         name: 'group_alt_bot',
         methods: ['POST'],
         requirements: ['altId' => '\d+', 'botId' => '\d+']
@@ -44,7 +44,7 @@ class GroupAltBot extends AltController
     }
 
     #[Route(
-        '/api/alt/{altId}/{botId}',
+        '/api/alts/{altId}/bots/{botId}',
         name: 'ungroup_alt_bot',
         methods: ['DELETE'],
         requirements: ['altId' => '\d+', 'botId' => '\d+']

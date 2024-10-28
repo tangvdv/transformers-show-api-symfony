@@ -14,7 +14,7 @@ use App\Normalizer\ConceptArt\CreateUpdateConceptArtNormalizer;
 class UpdateConceptArt extends ConceptArtController
 {
     #[Route(
-        '/api/conceptart/{id}',
+        '/api/conceptarts/{id}',
         name: 'update_concept_art',
         methods: ['PUT'],
         requirements: ['id' => '\d+']

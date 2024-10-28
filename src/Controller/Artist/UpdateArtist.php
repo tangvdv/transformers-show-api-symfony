@@ -12,7 +12,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class UpdateArtist extends ArtistController
 {
     #[Route(
-        '/api/artist/{id}',
+        '/api/artists/{id}',
         name: 'update_artist',
         methods: ['PUT'],
         requirements: ['id' => '\d+']

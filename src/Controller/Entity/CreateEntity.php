@@ -13,7 +13,7 @@ use App\Normalizer\Entity\EntityNormalizer;
 class CreateEntity extends EntityController
 {
     #[Route(
-        '/api/entity',
+        '/api/entities',
         name: 'create_entity',
         methods: ['POST']
     )]

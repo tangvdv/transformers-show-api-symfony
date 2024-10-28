@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DeleteScreenTime extends ScreenTimeController
 {
     #[Route(
-        '/api/screentime/{id}',
+        '/api/screentimes/{id}',
         name: 'delete_screen_time',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']

@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DeleteVoiceActor extends VoiceActorController
 {
     #[Route(
-        '/api/voiceactor/{id}',
+        '/api/voiceactors/{id}',
         name: 'delete_voice_actor',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']

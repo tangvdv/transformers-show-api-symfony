@@ -19,7 +19,7 @@ use App\Repository\ScreenTimeRepository;
 class UpdateBot extends BotController
 {
     #[Route(
-        '/api/bot/{id}',
+        '/api/bots/{id}',
         name: 'update_bot',
         methods: ['PUT'],
         requirements: ['id' => '\d+']

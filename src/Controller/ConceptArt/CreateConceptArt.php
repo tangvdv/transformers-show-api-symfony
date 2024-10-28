@@ -15,7 +15,7 @@ use App\Normalizer\ConceptArt\CreateUpdateConceptArtNormalizer;
 class CreateConceptArt extends ConceptArtController
 {
     #[Route(
-        '/api/conceptart',
+        '/api/conceptarts',
         name: 'create_conceptart',
         methods: ['POST']
     )]

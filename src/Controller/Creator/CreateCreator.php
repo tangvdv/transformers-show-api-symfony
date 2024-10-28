@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Serializer;
 use App\Repository\NationalityRepository;
 use App\Entity\Creator;
 use App\Normalizer\Creator\CreateUpdateCreatorNormalizer;
@@ -15,7 +14,7 @@ use App\Normalizer\Creator\CreateUpdateCreatorNormalizer;
 class CreateCreator extends CreatorController
 {
     #[Route(
-        '/api/creator',
+        '/api/creators',
         name: 'create_creator',
         methods: ['POST']
     )]

@@ -14,7 +14,7 @@ use App\Repository\NationalityRepository;
 class UpdateCreator extends CreatorController
 {
     #[Route(
-        '/api/creator/{id}',
+        '/api/creators/{id}',
         name: 'update_creator',
         methods: ['PUT'],
         requirements: ['id' => '\d+']

@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 class GetHuman extends HumanController
 {
     #[Route(
-        '/api/human/{id}',
+        '/api/humans/{id}',
         name: 'get_human_id',
         methods: ['GET'],
         requirements: ['id' => '\d+']
@@ -22,7 +22,7 @@ class GetHuman extends HumanController
     }
 
     #[Route(
-        '/api/human/{name}',
+        '/api/humans/{name}',
         name: 'get_human_name',
         methods: ['GET'],
         requirements: ['name' => '\w+']

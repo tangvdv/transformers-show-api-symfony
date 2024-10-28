@@ -9,7 +9,7 @@ use App\Normalizer\Alt\AltNormalizer;
 class GetAlt extends AltController
 {
     #[Route(
-        '/api/alt/{id}',
+        '/api/alts/{id}',
         name: 'get_alt_id',
         methods: ['GET'],
         requirements: ['id' => '\d+']
