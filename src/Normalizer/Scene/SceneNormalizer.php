@@ -1,20 +1,21 @@
 <?php
 
-namespace App\Normalizer\ScreenTime;
+namespace App\Normalizer\Scene;
 
-use App\Entity\ScreenTime;
+use App\Entity\Scene;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class ScreenTimeNormalizer implements NormalizerInterface
+class SceneNormalizer implements NormalizerInterface
 {
     public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {        
         $json = [
             "id" => $object->getId(),
-            "hour" => $object->getHour(),
-            "minute" => $object->getMinute(),
-            "second" => $object->getSecond(),
-            "total" => $object->getTotal()
+            "description" => $object->getDescription(),
+            "start_time" => $object->getStartTime(),
+            "end_time" => $object->getEndTime(),
+            "duration" => $object->getDuration(),
+            "timestamp" => $object->getTimeStamp()
         ];
 
         return $json;
@@ -22,13 +23,13 @@ class ScreenTimeNormalizer implements NormalizerInterface
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []):bool
     {
-        return $data instanceof ScreenTime && $format == 'json';
+        return $data instanceof Scene && $format == 'json';
     }
 
     public function getSupportedTypes(?string $format): array
     {
         return [
-            ScreenTime::class => true
+            Scene::class => true
         ];
     }
 }

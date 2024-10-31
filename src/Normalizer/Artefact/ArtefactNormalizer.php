@@ -13,7 +13,7 @@ class ArtefactNormalizer implements NormalizerInterface
             "id" => $object->getId(),
             "name" => $object->getEntity() !== null ? $object->getEntity()->getEntityName() : null,
             "image" => $object->getEntity()->getImage(),
-            "screen_time" => $object->getScreenTime() !== null ? $object->getScreenTime()->getTotal() : null,
+            "screen_time" => array_sum(array_map(fn($scene) => $scene->getTimeStamp(), $object->getScenes()->toArray())),
             "show" => []
         ];
 

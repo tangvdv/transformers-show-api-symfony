@@ -57,8 +57,7 @@ class ArtefactRepository extends ServiceEntityRepository
                         }
                     }
 
-                    return $query->setMaxResults(1)
-                                ->getQuery()
+                    return $query->getQuery()
                                 ->getOneOrNullResult();
     }
 }

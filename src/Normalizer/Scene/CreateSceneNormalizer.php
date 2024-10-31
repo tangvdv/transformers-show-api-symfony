@@ -1,20 +1,21 @@
 <?php
 
-namespace App\Normalizer\ScreenTime;
+namespace App\Normalizer\Scene;
 
-use App\Entity\ScreenTime;
+use App\Entity\Scene;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-class CreateScreenTimeNormalizer implements NormalizerInterface
+class CreateSceneNormalizer implements NormalizerInterface
 {
     public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {        
         $json = [
             "id" => $object->getId(),
-            "hour" => $object->getHour(),
-            "minute" => $object->getMinute(),
-            "second" => $object->getSecond(),
-            "total" => $object->getTotal()
+            "description" => $object->getDescription(),
+            "start_time" => $object->getStartTime(),
+            "end_time" => $object->getEndTime(),
+            "duration" => $object->getDuration(),
+            "timestamp" => $object->getTimeStamp()
         ];
 
         if(array_key_exists("filter", $context)){
@@ -26,7 +27,6 @@ class CreateScreenTimeNormalizer implements NormalizerInterface
                         "id" => $artefact->getId(),
                         "name" => $artefact->getEntity() !== null ? $artefact->getEntity()->getEntityName() : null,
                         "image" => $artefact->getImage(),
-                        "screen_time" => $artefact->getScreenTime()->getTotal(),
                         "show" => $artefact->getShow() !== null ? $artefact->getShow()->getShowName() : null
                     ];
                     array_push($json["artefact"], $a);
@@ -39,7 +39,6 @@ class CreateScreenTimeNormalizer implements NormalizerInterface
                         "id" => $bot->getId(),
                         "name" => $bot->getEntity() !== null ? $bot->getEntity()->getEntityName() : null,
                         "image" => $bot->getImage(),
-                        "screen_time" => $bot->getScreenTime()->getTotal(),
                         "show" => $bot->getShow() !== null ? $bot->getShow()->getShowName() : null
                     ];
                     array_push($json["bot"], $b);
@@ -52,7 +51,6 @@ class CreateScreenTimeNormalizer implements NormalizerInterface
                         "id" => $human->getId(),
                         "name" => $human->getEntity() !== null ? $human->getEntity()->getEntityName() : null,
                         "image" => $human->getImage(),
-                        "screen_time" => $human->getScreenTime()->getTotal(),
                         "show" => $human->getShow() !== null ? $human->getShow()->getShowName() : null
                     ];
                     array_push($json["human"], $h);
@@ -65,13 +63,13 @@ class CreateScreenTimeNormalizer implements NormalizerInterface
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []):bool
     {
-        return $data instanceof ScreenTime && $format == 'json';
+        return $data instanceof Scene && $format == 'json';
     }
 
     public function getSupportedTypes(?string $format): array
     {
         return [
-            ScreenTime::class => true
+            Scene::class => true
         ];
     }
 }

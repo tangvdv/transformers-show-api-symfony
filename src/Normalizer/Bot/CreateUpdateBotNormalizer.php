@@ -20,7 +20,7 @@ class CreateUpdateBotNormalizer implements NormalizerInterface
             "robot_to_alt_count" => $object->getRobotToAlt(),
             "death_count" => $object->getDeathCount(),
             "kill_count" => $object->getKillCount(),
-            "screen_time" => $object->getScreenTime() ? $object->getScreenTime()->getTotal() : null,
+            "screen_time" => array_sum(array_map(fn($scene) => $scene->getTimeStamp(), $object->getScenes()->toArray())),
             "show" => $object->getShow() !== null ? $object->getShow()->getShowName() : null
         ];
 

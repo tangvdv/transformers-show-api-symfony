@@ -65,8 +65,10 @@ class BotRepository extends ServiceEntityRepository
 
                     //SHOW
                     ->leftJoin('b.show', 's')
-                    ->addSelect('s');
+                    ->addSelect('s')
 
+                    ->leftJoin('b.scenes', 'sc')
+                    ->addSelect('sc');
 
                     foreach($params as $key => $value){
                         if($key === "id"){
@@ -84,8 +86,7 @@ class BotRepository extends ServiceEntityRepository
                         }
                     }
 
-                    return $query->setMaxResults(1)
-                                ->getQuery()
+                    return $query->getQuery()
                                 ->getOneOrNullResult();
     }
 }

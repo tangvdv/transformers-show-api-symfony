@@ -1,33 +1,33 @@
 <?php
-// src/Controller/ScreenTime/DeleteScreenTime.php
-namespace App\Controller\ScreenTime;
+// src/Controller/Scene/DeleteScene.php
+namespace App\Controller\Scene;
 
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-class DeleteScreenTime extends ScreenTimeController
+class DeleteScene extends SceneController
 {
     #[Route(
-        '/api/screentimes/{id}',
-        name: 'delete_screen_time',
+        '/api/scenes/{id}',
+        name: 'delete_scene',
         methods: ['DELETE'],
         requirements: ['id' => '\d+']
     )]
     #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
     public function __invoke(int $id, EntityManagerInterface $entityManager): Response
     {
-        $screentime = $this->screenTimeRepository->findOneById($id);
+        $scene = $this->sceneRepository->findOneById($id);
 
-        if($screentime){
-            $entityManager->remove($screentime);
+        if($scene){
+            $entityManager->remove($scene);
             $entityManager->flush();
 
             return $this->responseHandler->createResponse(Response::HTTP_NO_CONTENT);
         }
         else{
-            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Screen Time not found");
+            return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Scene not found");
         }
     }
 }

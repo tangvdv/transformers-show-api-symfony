@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\HumanRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -31,9 +33,13 @@ class Human
     #[ORM\JoinColumn(nullable: true)]
     private ?Show $show = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?ScreenTime $screen_time = null;
+    #[ORM\ManyToMany(targetEntity: Scene::class, mappedBy: 'humans')]
+    private ?Collection $scenes = null;
+
+    public function __construct()
+    {
+        $this->scenes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -109,14 +115,26 @@ class Human
         return $this;
     }
 
-    public function getScreenTime(): ?ScreenTime
+    /**
+     * @return Collection<int, Scene>
+     */
+    public function getScenes(): ?Collection
     {
-        return $this->screen_time;
+        return $this->scenes;
     }
 
-    public function setScreenTime(ScreenTime $screen_time): static
+    public function addScene(Scene $scene): static
     {
-        $this->screen_time = $screen_time;
+        if (!$this->scenes->contains($scene)) {
+            $this->scenes->add($scene);
+        }
+
+        return $this;
+    }
+
+    public function removeScene(Scene $scene): static
+    {
+        $this->scenes->removeElement($scene);
 
         return $this;
     }

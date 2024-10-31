@@ -45,9 +45,8 @@ class Bot
     #[ORM\JoinColumn(nullable: true)]
     private ?Show $show = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?ScreenTime $screen_time = null;
+    #[ORM\ManyToMany(targetEntity: Scene::class, mappedBy: 'bots')]
+    private ?Collection $scenes = null;
 
     #[ORM\OneToMany(targetEntity: Membership::class, mappedBy: "bot")]
     private ?Collection $memberships;
@@ -58,11 +57,14 @@ class Bot
     #[ORM\ManyToMany(targetEntity: VoiceActor::class, mappedBy: "bots")]
     private ?Collection $voice_actors;
 
+    private ?int $screen_time;
+
     public function __construct()
     {
         $this->memberships = new ArrayCollection();
         $this->alts = new ArrayCollection();
         $this->voice_actors = new ArrayCollection();
+        $this->scenes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -185,18 +187,6 @@ class Bot
         return $this;
     }
 
-    public function getScreenTime(): ?ScreenTime
-    {
-        return $this->screen_time;
-    }
-
-    public function setScreenTime(?ScreenTime $screen_time): static
-    {
-        $this->screen_time = $screen_time;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Faction>
      */
@@ -210,6 +200,30 @@ class Bot
         if (!$this->memberships->contains($membership)) {
             $this->memberships->add($membership);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Scene>
+     */
+    public function getScenes(): ?Collection
+    {
+        return $this->scenes;
+    }
+
+    public function addScene(Scene $scene): static
+    {
+        if (!$this->scenes->contains($scene)) {
+            $this->scenes->add($scene);
+        }
+
+        return $this;
+    }
+
+    public function removeScene(Scene $scene): static
+    {
+        $this->scenes->removeElement($scene);
 
         return $this;
     }
@@ -260,6 +274,18 @@ class Bot
     public function removeVoiceActor(VoiceActor $voice_actor): static
     {
         $this->voice_actors->removeElement($voice_actor);
+
+        return $this;
+    }
+
+    public function getScreenTime(): ?int
+    {
+        return $this->screen_time;
+    }
+
+    public function setScreenTime(int $screen_time): static
+    {
+        $this->screen_time = $screen_time;
 
         return $this;
     }

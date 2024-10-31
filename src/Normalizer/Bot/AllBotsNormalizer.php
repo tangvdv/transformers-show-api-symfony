@@ -16,7 +16,7 @@ class AllBotsNormalizer implements NormalizerInterface
             "image" => $object->getImage(),
             "faction" => [],
             "alt" => [],
-            "screen_time" => $object->getScreenTime() ? $object->getScreenTime()->getTotal() : null,
+            "screen_time" => array_sum(array_map(fn($scene) => $scene->getTimeStamp(), $object->getScenes()->toArray())),
             "show" => []
         ];
 

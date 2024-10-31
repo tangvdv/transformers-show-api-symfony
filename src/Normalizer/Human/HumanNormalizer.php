@@ -14,7 +14,7 @@ class HumanNormalizer implements NormalizerInterface
             "name" => $object->getEntity() !== null ? $object->getEntity()->getEntityName() : null,
             "image" => $object->getImage(),
             "actor" => [],
-            "screen_time" => $object->getScreenTime() ? $object->getScreenTime()->getTotal() : null,
+            "screen_time" => array_sum(array_map(fn($scene) => $scene->getTimeStamp(), $object->getScenes()->toArray())),
             "show" => []
         ];
 
