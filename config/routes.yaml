@@ -25,3 +25,7 @@ normalizers:
 api_login_check:
     path: /auth/login
     methods: [POST]
+
+api_token_check:
+    path: /auth/token
+    methods: [POST]

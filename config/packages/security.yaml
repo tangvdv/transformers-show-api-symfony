@@ -4,10 +4,20 @@ security:
             algorithm: 'bcrypt'
             cost: 15
     providers:
-        app_user_provider:
+        users:
+            chain: 
+                providers: [user_provider, app_provider]
+
+        user_provider:
             entity:
                 class: App\Entity\User
                 property: email
+
+        app_provider:
+            entity:
+                class: App\Entity\Application
+                property: client_id
+    
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -16,7 +26,7 @@ security:
         login:
             pattern: ^/auth/login
             stateless: true
-            provider: app_user_provider
+            provider: user_provider
             json_login:
                 check_path: /auth/login
                 username_path: email
@@ -24,25 +34,31 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
         
-        api:
-            pattern:   ^/
+        token:
+            pattern: ^/auth/token
             stateless: true
-            jwt: ~
+            provider: app_provider
+            json_login:
+                check_path: /auth/token
+                username_path: client_id
+                password_path: client_secret
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
         
-        main:
-            lazy: true
-            provider: app_user_provider
+        api:
+            pattern:   ^/api
+            stateless: true
+            entry_point: jwt
+            jwt: ~
+            provider: users
+        
 
 
     access_control:
         - { path: ^/auth/login,         roles: PUBLIC_ACCESS }
+        - { path: ^/auth/token,         roles: PUBLIC_ACCESS }
         - { path: ^/auth/signup,        roles: PUBLIC_ACCESS }
-        - { path: ^/api/users,          roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/api/me,             roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/api/artists,        roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/api/entities,       roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/api/scenes,         roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/api,                roles: PUBLIC_ACCESS }
+        - { path: ^/api,                roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:

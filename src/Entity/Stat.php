@@ -2,14 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\LogsRepository;
+use App\Repository\StatRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\DBAL\Types\Types;
 
-#[ORM\Entity(repositoryClass: LogsRepository::class)]
-#[ORM\Table(name: '`logs`')]
-class Logs
+#[ORM\Entity(repositoryClass: StatRepository::class)]
+#[ORM\Table(name: '`stat`')]
+class Stat
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -28,24 +28,12 @@ class Logs
     #[Assert\NotNull()]
     private ?\DateTimeImmutable $request_at = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[Assert\NotBlank()]
-    private ?string $userAgent = null;
-
-    #[ORM\Column(type: 'integer')]
-    #[Assert\NotNull()]
-    private ?int $User_id = null;
+    #[ORM\ManyToOne(inversedBy: 'stats')]
+    private ?Application $application = null;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setId(int $id): static
-    {
-        $this->id = $id;
-
-        return $this;
     }
 
     public function getEndpoint(): ?string
@@ -84,26 +72,14 @@ class Logs
         return $this;
     }
 
-    public function getUserAgent(): ?string
+    public function getApplication(): ?Application
     {
-        return $this->userAgent;
+        return $this->application;
     }
 
-    public function setUserAgent(string $userAgent): static
+    public function setApplication(?Application $application): static
     {
-        $this->userAgent = $userAgent;
-
-        return $this;
-    }
-
-    public function getUserId(): ?int
-    {
-        return $this->User_id;
-    }
-
-    public function setUserId(int $User_id): static
-    {
-        $this->User_id = $User_id;
+        $this->application = $application;
 
         return $this;
     }

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -62,11 +64,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotNull()]
     private ?\DateTimeImmutable $updated_at = null;
 
+    #[ORM\OneToMany(targetEntity: Log::class, mappedBy: 'user')]
+    private ?Collection $log = null;
+
+    #[ORM\OneToMany(targetEntity: Application::class, mappedBy: 'user')]
+    private ?Collection $applications = null;
+
     public function __construct()
     {
         $this->email_verified = 0;
         $this->created_at = new \DateTimeImmutable();
         $this->updated_at = new \DateTimeImmutable();
+        $this->log = new ArrayCollection();
+        $this->applications = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -208,5 +218,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
+    }
+
+    /**
+     * @return Collection<int, Log>
+     */
+    public function getLogs(): ?Collection
+    {
+        return $this->log;
+    }
+
+    /**
+     * @return Collection<int, Application>
+     */
+    public function getApplications(): ?Collection
+    {
+        return $this->applications;
+    }
+
+    public function addApplication(Application $application): static
+    {
+        if (!$this->applications->contains($application)) {
+            $this->applications->add($application);
+        }
+
+        return $this;
+    }
+
+    public function removeApplication(Application $application): static
+    {
+        $this->applications->removeElement($application);
+
+        return $this;
     }
 }
