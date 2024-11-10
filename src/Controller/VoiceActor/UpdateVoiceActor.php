@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\NationalityRepository;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class UpdateVoiceActor extends VoiceActorController
 {
@@ -18,7 +19,7 @@ class UpdateVoiceActor extends VoiceActorController
         methods: ['PUT'],
         requirements: ['id' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(int $id, Request $request, EntityManagerInterface $entityManager, NationalityRepository $nationalityRepository): Response
     {
         $voiceactor = $this->voiceactorRepository->findOneWithParams(array("id" => $id));

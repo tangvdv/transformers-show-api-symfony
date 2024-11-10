@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class UpdateAlt extends AltController
 {
@@ -17,7 +18,7 @@ class UpdateAlt extends AltController
         methods: ['PUT'],
         requirements: ['id' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(int $id, Request $request, EntityManagerInterface $entityManager): Response
     {
         $alt = $this->altRepository->findOneWithParams(array("id" => $id));

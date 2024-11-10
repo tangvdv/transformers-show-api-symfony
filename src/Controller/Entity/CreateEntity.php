@@ -9,6 +9,7 @@ use App\Entity\Entity;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Normalizer\Entity\EntityNormalizer;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class CreateEntity extends EntityController
 {
@@ -17,7 +18,7 @@ class CreateEntity extends EntityController
         name: 'create_entity',
         methods: ['POST']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(Request $request, EntityManagerInterface $entityManager): Response
     {
         $payload = $request->getPayload();

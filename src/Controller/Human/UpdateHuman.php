@@ -11,6 +11,7 @@ use App\Repository\ShowRepository;
 use App\Repository\EntityRepository;
 use App\Normalizer\Human\HumanNormalizer;
 use App\Repository\ScreenTimeRepository;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class UpdateHuman extends HumanController
 {
@@ -20,7 +21,7 @@ class UpdateHuman extends HumanController
         methods: ['PUT'],
         requirements: ['id' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(int $id, Request $request, EntityManagerInterface $entityManager, ShowRepository $showRepository, EntityRepository $entityRepository, ScreenTimeRepository $screenTimeRepository): Response
     {
         $human = $this->humanRepository->findOneWithParams(array("id" => $id));

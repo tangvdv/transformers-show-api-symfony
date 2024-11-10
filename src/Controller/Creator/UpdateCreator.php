@@ -8,8 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Serializer;
-use App\Repository\NationalityRepository;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class UpdateCreator extends CreatorController
 {
@@ -19,8 +18,8 @@ class UpdateCreator extends CreatorController
         methods: ['PUT'],
         requirements: ['id' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
-    public function __invoke(int $id, Request $request, EntityManagerInterface $entityManager, NationalityRepository $nationalityRepository): Response
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
+    public function __invoke(int $id, Request $request, EntityManagerInterface $entityManager): Response
     {
         $creator = $this->creatorRepository->findOneWithParams(array("id" => $id));
 

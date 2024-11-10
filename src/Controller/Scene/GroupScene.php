@@ -10,6 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\ArtefactRepository;
 use App\Repository\BotRepository;
 use App\Repository\HumanRepository;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GroupScene extends SceneController
 {
@@ -19,7 +20,7 @@ class GroupScene extends SceneController
         methods: ['POST'],
         requirements: ['sceneId' => '\d+', 'artefactId' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function groupToArtefact(int $sceneId, int $artefactId, EntityManagerInterface $entityManager, ArtefactRepository $artefactRepository): Response
     {
         $artefact = $artefactRepository->find($artefactId);
@@ -56,7 +57,7 @@ class GroupScene extends SceneController
         methods: ['POST'],
         requirements: ['sceneId' => '\d+', 'botId' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function groupToBot(int $sceneId, int $botId, EntityManagerInterface $entityManager, BotRepository $botRepository): Response
     {
         $bot = $botRepository->find($botId);
@@ -93,7 +94,7 @@ class GroupScene extends SceneController
         methods: ['POST'],
         requirements: ['sceneId' => '\d+', 'humanId' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function groupToHuman(int $sceneId, int $humanId, EntityManagerInterface $entityManager, HumanRepository $humanRepository): Response
     {
         $human = $humanRepository->find($humanId);

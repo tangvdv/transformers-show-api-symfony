@@ -10,6 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\NationalityRepository;
 use App\Entity\Actor;
 use App\Normalizer\Actor\CreateUpdateActorNormalizer;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class CreateActor extends ActorController
 {
@@ -18,7 +19,7 @@ class CreateActor extends ActorController
         name: 'create_actor',
         methods: ['POST']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(Request $request, EntityManagerInterface $entityManager, NationalityRepository $nationalityRepository): Response
     {
         $payload = $request->getPayload();

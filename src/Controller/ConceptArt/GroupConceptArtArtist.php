@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Repository\ArtistRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GroupConceptArtArtist extends ConceptArtController
 {
@@ -17,7 +18,7 @@ class GroupConceptArtArtist extends ConceptArtController
         methods: ['POST'],
         requirements: ['conceptartId' => '\d+', 'artistId' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function groupArtistToConceptArt(int $conceptartId, int $artistId, ArtistRepository $artistRepository, EntityManagerInterface $entityManager): Response
     {
         $conceptart = $this->conceptArtRepository->find($conceptartId);
@@ -49,7 +50,7 @@ class GroupConceptArtArtist extends ConceptArtController
         methods: ['DELETE'],
         requirements: ['conceptartId' => '\d+', 'artistId' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function removeArtistFromConceptArt(int $conceptartId, int $artistId, ArtistRepository $artistRepository, EntityManagerInterface $entityManager): Response
     {
         $conceptart = $this->conceptArtRepository->find($conceptartId);

@@ -11,6 +11,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\EntityRepository;
 use App\Repository\ShowRepository;
 use App\Normalizer\VoiceLine\VoiceLineNormalizer;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class CreateVoiceLine extends VoiceLineController
 {
@@ -19,7 +20,7 @@ class CreateVoiceLine extends VoiceLineController
         name: 'create_voice_line',
         methods: ['POST']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(Request $request, EntityManagerInterface $entityManager, EntityRepository $entityRepository, ShowRepository $showRepository): Response
     {
         $payload = $request->getPayload();

@@ -6,6 +6,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use App\Normalizer\ConceptArt\ConceptArtNormalizer;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GetConceptArt extends ConceptArtController
 {
@@ -15,6 +17,7 @@ class GetConceptArt extends ConceptArtController
         methods: ['GET'],
         requirements: ['id' => '\d+']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function getConceptArtByID(int $id): Response
     {
         $conceptart = $this->conceptArtRepository->findOneWithParams(array("id" => $id));
@@ -27,6 +30,7 @@ class GetConceptArt extends ConceptArtController
         methods: ['GET'],
         requirements: ['title' => '\w+']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function getConceptArtByName(string $title, Request $request): Response
     {
         $show = null;

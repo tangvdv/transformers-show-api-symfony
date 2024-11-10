@@ -14,6 +14,7 @@ use App\Normalizer\Bot\CreateUpdateBotNormalizer;
 use App\Repository\FactionRepository;
 use App\Entity\Membership;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class CreateBot extends BotController
 {
@@ -22,7 +23,7 @@ class CreateBot extends BotController
         name: 'create_bot',
         methods: ['POST']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(Request $request, EntityManagerInterface $entityManager, EntityRepository $entityRepository, ShowRepository $showRepository, FactionRepository $factionRepository): Response
     {
         $payload = $request->getPayload();

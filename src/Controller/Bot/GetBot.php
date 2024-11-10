@@ -6,6 +6,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use App\Normalizer\Bot\BotNormalizer;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GetBot extends BotController
 {
@@ -15,6 +17,7 @@ class GetBot extends BotController
         methods: ['GET'],
         requirements: ['id' => '\d+']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function getBotByID(int $id): Response
     {
         $bot = $this->botRepository->findOneWithParams(array("id" => $id));
@@ -27,6 +30,7 @@ class GetBot extends BotController
         methods: ['GET'],
         requirements: ['name' => '\w+']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function getBotByName(string $name, Request $request): Response
     {
         $show = null;

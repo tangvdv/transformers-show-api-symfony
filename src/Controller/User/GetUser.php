@@ -6,6 +6,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Normalizer\User\UserNormalizer;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GetUser extends UserController
 {
@@ -14,7 +15,7 @@ class GetUser extends UserController
         name: 'user',
         methods: ['GET']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(int $id): Response
     {
         $user = $this->userRepository->findOneBy(array("id" => $id));

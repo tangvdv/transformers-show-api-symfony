@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Normalizer\Entity\EntityNormalizer;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class UpdateEntity extends EntityController
 {
@@ -17,7 +18,7 @@ class UpdateEntity extends EntityController
         methods: ['PUT'],
         requirements: ['id' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(int $id, Request $request, EntityManagerInterface $entityManager): Response
     {
         $entity = $this->entityRepository->findOneBy(array("id" => $id));

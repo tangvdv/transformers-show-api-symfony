@@ -9,6 +9,7 @@ use App\Entity\Show;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Normalizer\Show\CreateUpdateShowNormalizer;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class CreateShow extends ShowController
 {
@@ -17,7 +18,7 @@ class CreateShow extends ShowController
         name: 'create_show',
         methods: ['POST']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(Request $request, EntityManagerInterface $entityManager): Response
     {
         $payload = $request->getPayload();

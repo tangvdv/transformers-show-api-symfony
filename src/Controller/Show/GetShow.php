@@ -5,6 +5,8 @@ namespace App\Controller\Show;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use App\Normalizer\Show\ShowNormalizer;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GetShow extends ShowController
 {
@@ -14,6 +16,7 @@ class GetShow extends ShowController
         methods: ['GET'],
         requirements: ['id' => '\d+']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function getShowByID(int $id): Response
     {
         $show = $this->showRepository->findById($id);
@@ -26,6 +29,7 @@ class GetShow extends ShowController
         methods: ['GET'],
         requirements: ['name' => '\w+']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function getShowByName(string $name): Response
     {
         $show = $this->showRepository->findByName($name);

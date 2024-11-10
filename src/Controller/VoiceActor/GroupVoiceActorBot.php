@@ -8,6 +8,7 @@ use App\Normalizer\VoiceActor\VoiceActorNormalizer;
 use App\Repository\BotRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GroupVoiceActorBot extends VoiceActorController
 {
@@ -17,7 +18,7 @@ class GroupVoiceActorBot extends VoiceActorController
         methods: ['POST'],
         requirements: ['voiceactorId' => '\d+', 'botId' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function groupBotToVoiceActor(int $voiceactorId, int $botId, BotRepository $botRepository, EntityManagerInterface $entityManager): Response
     {
         $voiceactor = $this->voiceactorRepository->find($voiceactorId);
@@ -49,7 +50,7 @@ class GroupVoiceActorBot extends VoiceActorController
         methods: ['DELETE'],
         requirements: ['voiceactorId' => '\d+', 'botId' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function removeBotFromVoiceActor(int $voiceactorId, int $botId, BotRepository $botRepository, EntityManagerInterface $entityManager): Response
     {
         $voiceactor = $this->voiceactorRepository->find($voiceactorId);

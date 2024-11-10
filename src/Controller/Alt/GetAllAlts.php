@@ -7,6 +7,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use App\Controller\ResponseHandler;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GetAllAlts extends AltController
 {
@@ -15,6 +17,7 @@ class GetAllAlts extends AltController
         name: 'get_alts',
         methods: ['GET']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(Request $request, ResponseHandler $responseHandler): Response
     {
         $limit = 10;

@@ -6,6 +6,7 @@ use App\Normalizer\Artist\ArtistNormalizer;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GetAllArtists extends ArtistController
 {
@@ -14,7 +15,7 @@ class GetAllArtists extends ArtistController
         name: 'get_artists',
         methods: ['GET']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(): Response
     {   
         $artists = $this->artistRepository->findAll();

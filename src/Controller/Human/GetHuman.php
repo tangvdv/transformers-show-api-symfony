@@ -6,6 +6,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use App\Normalizer\Human\HumanNormalizer;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GetHuman extends HumanController
 {
@@ -15,6 +17,7 @@ class GetHuman extends HumanController
         methods: ['GET'],
         requirements: ['id' => '\d+']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function getHumanByID(int $id): Response
     {
         $human = $this->humanRepository->findOneWithParams(array("id" => $id));
@@ -27,6 +30,7 @@ class GetHuman extends HumanController
         methods: ['GET'],
         requirements: ['name' => '\w+']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function getHumanByName(string $name, Request $request): Response
     {
         $show = null;

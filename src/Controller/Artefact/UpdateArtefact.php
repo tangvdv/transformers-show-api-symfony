@@ -11,6 +11,7 @@ use App\Repository\ShowRepository;
 use App\Repository\EntityRepository;
 use App\Normalizer\Artefact\ArtefactNormalizer;
 use App\Repository\ScreenTimeRepository;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class UpdateArtefact extends ArtefactController
 {
@@ -20,7 +21,7 @@ class UpdateArtefact extends ArtefactController
         methods: ['PUT'],
         requirements: ['id' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(int $id, Request $request, EntityManagerInterface $entityManager, ShowRepository $showRepository, EntityRepository $entityRepository, ScreenTimeRepository $screenTimeRepository): Response
     {
         $artefact = $this->artefactRepository->findOneWithParams(array("id" => $id));

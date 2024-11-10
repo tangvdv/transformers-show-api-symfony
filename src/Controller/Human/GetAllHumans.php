@@ -6,6 +6,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use App\Normalizer\Human\HumanNormalizer;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GetAllHumans extends HumanController
 {
@@ -14,6 +16,7 @@ class GetAllHumans extends HumanController
         name: 'get_humans',
         methods: ['GET']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(Request $request): Response
     {
         $limit = 10;

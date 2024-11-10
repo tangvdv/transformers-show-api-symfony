@@ -8,6 +8,7 @@ use App\Normalizer\Alt\AltNormalizer;
 use App\Repository\BotRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GroupAltBot extends AltController
 {
@@ -17,7 +18,7 @@ class GroupAltBot extends AltController
         methods: ['POST'],
         requirements: ['altId' => '\d+', 'botId' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function groupBotToAlt(int $altId, int $botId, BotRepository $botRepository, EntityManagerInterface $entityManager): Response
     {
         $alt = $this->altRepository->find($altId);
@@ -49,7 +50,7 @@ class GroupAltBot extends AltController
         methods: ['DELETE'],
         requirements: ['altId' => '\d+', 'botId' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function removeBotFromAlt(int $altId, int $botId, BotRepository $botRepository, EntityManagerInterface $entityManager): Response
     {
         $alt = $this->altRepository->find($altId);

@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class DeleteBot extends BotController
 {
@@ -16,7 +17,7 @@ class DeleteBot extends BotController
         methods: ['DELETE'],
         requirements: ['id' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(int $id, EntityManagerInterface $entityManager, MembershipRepository $membershipRepository): Response
     {
         $bot = $this->botRepository->findOneWithParams(array("id" => $id));

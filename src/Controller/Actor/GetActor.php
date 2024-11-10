@@ -5,6 +5,8 @@ namespace App\Controller\Actor;
 use App\Normalizer\Actor\ActorNormalizer;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class GetActor extends ActorController
 {
@@ -14,6 +16,7 @@ class GetActor extends ActorController
         methods: ['GET'],
         requirements: ['id' => '\d+']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function getActorByID(int $id): Response
     {
         $actor = $this->actorRepository->findOneWithParams(array("id" => $id));
@@ -26,6 +29,7 @@ class GetActor extends ActorController
         methods: ['GET'],
         requirements: ['name' => '\w+']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function getActorByName(string $name): Response
     {
         $actor = $this->actorRepository->findOneWithParams(array("name" => $name));

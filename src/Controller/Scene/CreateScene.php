@@ -12,6 +12,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\ArtefactRepository;
 use App\Repository\BotRepository;
 use App\Repository\HumanRepository;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class CreateScene extends SceneController
 {
@@ -21,7 +22,7 @@ class CreateScene extends SceneController
         methods: ['POST'],
         requirements: ['artefactId' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function createForArtefact(int $artefactId, Request $request, EntityManagerInterface $entityManager, ArtefactRepository $artefactRepository): Response
     {
         $artefact = $artefactRepository->find($artefactId);

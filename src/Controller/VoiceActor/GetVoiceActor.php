@@ -5,6 +5,8 @@ namespace App\Controller\VoiceActor;
 use App\Normalizer\VoiceActor\VoiceActorNormalizer;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GetVoiceActor extends VoiceActorController
 {
@@ -14,6 +16,7 @@ class GetVoiceActor extends VoiceActorController
         methods: ['GET'],
         requirements: ['id' => '\d+']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function getVoiceActorByID(int $id): Response
     {
         $voice_actor = $this->voiceactorRepository->findOneWithParams(array("id" => $id));
@@ -26,6 +29,7 @@ class GetVoiceActor extends VoiceActorController
         methods: ['GET'],
         requirements: ['name' => '\w+']
     )]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') or is_granted('ROLE_APPLICATION')"), statusCode: 403, message: 'Forbidden')]
     public function getVoiceActorByName(string $name): Response
     {
         $voiceactor = $this->voiceactorRepository->findOneWithParams(array("name" => $name));

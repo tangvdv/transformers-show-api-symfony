@@ -12,6 +12,7 @@ use App\Repository\EntityRepository;
 use App\Repository\ShowRepository;
 use App\Normalizer\Artefact\ArtefactNormalizer;
 use App\Repository\ScreenTimeRepository;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class CreateArtefact extends ArtefactController
 {
@@ -20,7 +21,7 @@ class CreateArtefact extends ArtefactController
         name: 'create_artefact',
         methods: ['POST']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(Request $request, EntityManagerInterface $entityManager, EntityRepository $entityRepository, ShowRepository $showRepository, ScreenTimeRepository $screenTimeRepository): Response
     {
         $payload = $request->getPayload();

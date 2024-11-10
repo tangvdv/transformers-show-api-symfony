@@ -10,6 +10,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Repository\ShowRepository;
 use App\Repository\EntityRepository;
 use App\Normalizer\VoiceLine\VoiceLineNormalizer;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class UpdateVoiceLine extends VoiceLineController
 {
@@ -19,7 +20,7 @@ class UpdateVoiceLine extends VoiceLineController
         methods: ['PUT'],
         requirements: ['id' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(int $id, Request $request, EntityManagerInterface $entityManager, ShowRepository $showRepository, EntityRepository $entityRepository): Response
     {
         $voiceline = $this->voiceLineRepository->findOneBy(array("id" => $id));

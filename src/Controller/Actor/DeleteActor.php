@@ -6,6 +6,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class DeleteActor extends ActorController
 {
@@ -15,7 +16,7 @@ class DeleteActor extends ActorController
         methods: ['DELETE'],
         requirements: ['id' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function __invoke(int $id, EntityManagerInterface $entityManager): Response
     {
         $actor = $this->actorRepository->findOneWithParams(array("id" => $id));

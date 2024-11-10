@@ -8,6 +8,7 @@ use App\Normalizer\Creator\CreatorNormalizer;
 use App\Repository\ShowRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class GroupCreatorShow extends CreatorController
 {
@@ -17,7 +18,7 @@ class GroupCreatorShow extends CreatorController
         methods: ['POST'],
         requirements: ['creatorId' => '\d+', 'showId' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function groupCreatorToShow(int $creatorId, int $showId, ShowRepository $showRepository, EntityManagerInterface $entityManager): Response
     {
         $creator = $this->creatorRepository->find($creatorId);
@@ -49,7 +50,7 @@ class GroupCreatorShow extends CreatorController
         methods: ['DELETE'],
         requirements: ['creatorId' => '\d+', 'showId' => '\d+']
     )]
-    #[IsGranted('ROLE_ADMIN', statusCode: 403, message: 'Forbidden')]
+    #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
     public function removeCreatorFromShow(int $creatorId, int $showId, ShowRepository $showRepository, EntityManagerInterface $entityManager): Response
     {
         $creator = $this->creatorRepository->find($creatorId);
