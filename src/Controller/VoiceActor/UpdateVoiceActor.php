@@ -30,13 +30,13 @@ class UpdateVoiceActor extends VoiceActorController
         $params = [
             "first_name" => [
                 "value" =>  $payload->get("first_name"),
-                "default" => $voice_actor->getVoiceActorFirstname(),
+                "default" => $voiceactor->getVoiceActorFirstname(),
                 "type" => "string",
                 "nullable" => true
             ],
             "last_name" => [
                 "value" => $payload->get("last_name"),
-                "default" => $voice_actor->getVoiceActorLastname(),
+                "default" => $voiceactor->getVoiceActorLastname(),
                 "type" => "string",
                 "nullable" => true
             ],
