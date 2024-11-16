@@ -26,10 +26,10 @@ class Bot
     private ?int $transformation_count = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $alt_to_robot = null;
+    private ?int $alt_to_robot_count = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $robot_to_alt = null;
+    private ?int $robot_to_alt_count = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $death_count = null;
@@ -110,24 +110,24 @@ class Bot
 
     public function getAltToRobot(): ?int
     {
-        return $this->alt_to_robot;
+        return $this->alt_to_robot_count;
     }
 
-    public function setAltToRobot(?int $alt_to_robot): static
+    public function setAltToRobot(?int $alt_to_robot_count): static
     {
-        $this->alt_to_robot = $alt_to_robot;
+        $this->alt_to_robot_count = $alt_to_robot_count;
 
         return $this;
     }
 
     public function getRobotToAlt(): ?int
     {
-        return $this->robot_to_alt;
+        return $this->robot_to_alt_count;
     }
 
-    public function setRobotToAlt(?int $robot_to_alt): static
+    public function setRobotToAlt(?int $robot_to_alt_count): static
     {
-        $this->robot_to_alt = $robot_to_alt;
+        $this->robot_to_alt_count = $robot_to_alt_count;
 
         return $this;
     }
