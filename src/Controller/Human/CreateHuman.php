@@ -12,7 +12,6 @@ use App\Repository\EntityRepository;
 use App\Repository\ShowRepository;
 use App\Normalizer\Human\HumanNormalizer;
 use App\Repository\ActorRepository;
-use App\Repository\ScreenTimeRepository;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 class CreateHuman extends HumanController
@@ -23,7 +22,7 @@ class CreateHuman extends HumanController
         methods: ['POST']
     )]
     #[IsGranted(attribute: new Expression("is_granted('ROLE_USER') and is_granted('ROLE_ADMIN')"), statusCode: 403, message: 'Forbidden')]
-    public function __invoke(Request $request, EntityManagerInterface $entityManager, EntityRepository $entityRepository, ShowRepository $showRepository, ActorRepository $actorRepository, ScreenTimeRepository $screenTimeRepository): Response
+    public function __invoke(Request $request, EntityManagerInterface $entityManager, EntityRepository $entityRepository, ShowRepository $showRepository, ActorRepository $actorRepository): Response
     {
         $payload = $request->getPayload();
         $params = [
@@ -88,14 +87,6 @@ class CreateHuman extends HumanController
             return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Actor not found");
         }
 
-        $screen_time = null;
-        if($params["screen_timeId"]["value"] !== null){
-            $screen_time = $screenTimeRepository->find($params["screen_timeId"]["value"]);
-            if($screen_time === null){
-                return $this->responseHandler->createErrorResponse(Response::HTTP_NOT_FOUND, "Screen Time not found");
-            }
-        }
-
         if($this->humanRepository->findOneBy(
             array(
                 "entity" => $entity, 
@@ -109,9 +100,6 @@ class CreateHuman extends HumanController
             ->setEntity($entity)
             ->setShow($show)
             ->setActor($actor);
-        if($screen_time !== null){
-            $human->setScreenTime($screen_time);
-        }
 
         $entityManager->persist($human);
         $entityManager->flush();
