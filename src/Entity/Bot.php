@@ -188,7 +188,7 @@ class Bot
     }
 
     /**
-     * @return Collection<int, Faction>
+     * @return Collection<int, Membership>
      */
     public function getMemberships(): Collection
     {

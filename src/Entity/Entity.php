@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\EntityRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: EntityRepository::class)]
 #[ORM\Table(name: '`entity`')]
@@ -19,11 +21,23 @@ class Entity
     #[Assert\NotBlank()]
     private ?string $entity_name = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $image = null;
 
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $type = null;
+
+    #[ORM\OneToMany(targetEntity: Human::class, mappedBy: "entity")]
+    private ?Collection $humans = null;
+
+    #[ORM\OneToMany(targetEntity: Bot::class, mappedBy: "entity")]
+    private ?Collection $bots = null;
+
+    public function __construct()
+    {
+        $this->humans = new ArrayCollection();
+        $this->bots = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -71,5 +85,15 @@ class Entity
         $this->type = $type;
 
         return $this;
+    }
+
+    public function getBots(): ?Collection
+    {
+        return $this->bots;
+    }
+
+    public function getHumans(): ?Collection
+    {
+        return $this->humans;
     }
 }
